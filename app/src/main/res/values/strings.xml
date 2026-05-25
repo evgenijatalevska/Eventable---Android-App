@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Eventable</string>
+    <string name="facebook_app_id">1670153174716942</string>
+    <string name="fb_login_protocol_scheme">fb1670153174716942</string>
+    <string name="facebook_client_token">b5d30509e72353faae768474ccf64ebb</string>
+    <!-- Auth screen -->
+    <string name="welcome_back">Добредојдовте назад</string>
+    <string name="create_profile">Креирај профил</string>
+    <string name="enter_credentials">Внесете ги вашите податоци за најава</string>
+    <string name="start_managing">Започнете со менаџирање на вашите настани</string>
+    <string name="email_address">Е-маил адреса</string>
+    <string name="password">Лозинка</string>
+    <string name="login">Најави се</string>
+    <string name="register">Регистрирај се</string>
+    <string name="no_account">Немаш профил? Регистрирај се тука</string>
+    <string name="have_account">Веќе имаш профил? Најави се</string>
+    <string name="back_to_home">Назад кон почетна</string>
+    <string name="continue_google">Продолжи со Google</string>
+    <string name="continue_facebook">Продолжи со Facebook</string>
+    <string name="guest_login">Влези како Гостин 👤</string>
+    <string name="or_social">или преку социјалните мрежи</string>
+    <string name="login_email_btn">Најави се со Е-маил</string>
+    <string name="welcome_eventable">Повелете во Eventable</string>
+    <string name="manage_birthdays">Менаџирајте ги вашите родендени лесно</string>
 </resources>
