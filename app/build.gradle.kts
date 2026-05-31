@@ -84,4 +84,6 @@ dependencies {
 
     // 5. Firebase Analytics (Аналитика)
     implementation("com.google.firebase:firebase-analytics")
+
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
 }
