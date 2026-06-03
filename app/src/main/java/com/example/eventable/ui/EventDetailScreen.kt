@@ -3,12 +3,13 @@ package com.example.eventable.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -52,7 +53,6 @@ fun EventDetailScreen(
         return
     }
 
-    // Дијалог за потврда на бришење
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -123,36 +123,20 @@ fun EventDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (isEditMode) {
-                // Edit Mode
-                EventTextField(value = title, onValueChange = { title = it }, label = "Ime на настан *")
+                // --- EDIT MODE ---
+                EventTextField(value = title, onValueChange = { title = it }, label = "Име на настан *")
                 EventTextField(value = location, onValueChange = { location = it }, label = "Локација")
                 EventTextField(value = date, onValueChange = { date = it }, label = "Датум")
                 EventTextField(value = time, onValueChange = { time = it }, label = "Време")
                 EventTextField(value = offer, onValueChange = { offer = it }, label = "Понуда")
-                EventTextField(
-                    value = adultsCount,
-                    onValueChange = { adultsCount = it },
-                    label = "Број на возрасни",
-                    keyboardType = KeyboardType.Number
-                )
-                EventTextField(
-                    value = childrenCount,
-                    onValueChange = { childrenCount = it },
-                    label = "Број на деца",
-                    keyboardType = KeyboardType.Number
-                )
+                EventTextField(value = adultsCount, onValueChange = { adultsCount = it }, label = "Број на возрасни", keyboardType = KeyboardType.Number)
+                EventTextField(value = childrenCount, onValueChange = { childrenCount = it }, label = "Број на деца", keyboardType = KeyboardType.Number)
                 EventTextField(value = food, onValueChange = { food = it }, label = "Храна")
-                EventTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = "Белешки",
-                    singleLine = false,
-                    minLines = 3
-                )
+                EventTextField(value = notes, onValueChange = { notes = it }, label = "Белешки", singleLine = false, minLines = 3)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -192,53 +176,101 @@ fun EventDetailScreen(
                 }
 
             } else {
-                // View Mode
-                DetailRow(label = "📅 Датум", value = event.date)
-                DetailRow(label = "🕒 Време", value = event.time)
-                DetailRow(label = "📍 Локација", value = event.location)
-                DetailRow(label = "🎁 Понуда", value = event.offer)
-                DetailRow(label = "👨 Возрасни", value = event.adultsCount.toString())
-                DetailRow(label = "👧 Деца", value = event.childrenCount.toString())
-                DetailRow(label = "🍕 Храна", value = event.food)
+                // --- VIEW MODE (НОВ КЛАСИЧЕН ДИЗАЈН ЕДНО ПОД ДРУГО) ---
+
+                // Датум со зелена икона
+                DetailRowClean(
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                    text = event.date
+                )
+
+                // Време со зелена икона за часовник
+                DetailRowClean(
+                    icon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                    text = event.time
+                )
+
+                // Локација — комплетно тргната како што побара
+
+                // Понуда со зелено емоџи подарок 🎁
+                if (event.offer.isNotEmpty()) {
+                    DetailRowClean(
+                        icon = { Text("🎁", fontSize = 18.sp) },
+                        text = "Понуда: ${event.offer}"
+                    )
+                }
+
+                // Број на возрасни со емоџи 👨
+                if (event.adultsCount > 0) {
+                    DetailRowClean(
+                        icon = { Text("👨", fontSize = 18.sp) },
+                        text = "Број на возрасни: ${event.adultsCount}"
+                    )
+                }
+
+                // Број на деца со емоџи 👧
+                if (event.childrenCount > 0) {
+                    DetailRowClean(
+                        icon = { Text("👧", fontSize = 18.sp) },
+                        text = "Број на деца: ${event.childrenCount}"
+                    )
+                }
+
+                // Храна — Насловот и вредноста надолу
+                if (event.food.isNotEmpty()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("🍕", fontSize = 18.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Храна:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                        }
+                        Text(
+                            text = event.food,
+                            fontSize = 15.sp,
+                            color = TextDark.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(start = 28.dp, top = 4.dp)
+                        )
+                    }
+                }
+
+                // Белешки — Насловот и вредноста надолу
                 if (event.notes.isNotEmpty()) {
-                    DetailRow(label = "📝 Белешки", value = event.notes)
+                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("📝", fontSize = 18.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Белешки:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                        }
+                        Text(
+                            text = event.notes,
+                            fontSize = 15.sp,
+                            color = TextDark.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(start = 28.dp, top = 4.dp)
+                        )
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
+// Помошна мала компонента за чист приказ во еден ред
 @Composable
-fun DetailRow(label: String, value: String) {
-    if (value.isEmpty() || value == "0") return
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = PastelGreenPrimary.copy(alpha = 0.06f)
-        )
+fun DetailRowClean(
+    icon: @Composable () -> Unit,
+    text: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = label,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = TextDark.copy(alpha = 0.6f)
-            )
-            Text(
-                text = value,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextDark
-            )
-        }
+        icon()
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = text,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = TextDark
+        )
     }
 }

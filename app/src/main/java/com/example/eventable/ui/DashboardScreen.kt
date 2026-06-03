@@ -37,9 +37,19 @@ fun DashboardScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var currentAppScreen by remember { mutableStateOf(AppScreen.HOME) }
+
+    // Состојби за Настани
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var showAddEvent by remember { mutableStateOf(false) }
     val eventViewModel: EventViewModel = viewModel()
+
+    // Состојби за Понуди
+    var selectedOfferId by remember { mutableStateOf<String?>(null) }
+    var showAddOffer by remember { mutableStateOf(false) }
+    val offerViewModel: OfferViewModel = viewModel()
+
+    val offers by offerViewModel.offers.collectAsStateWithLifecycle()
+    val isOffersLoading by offerViewModel.isLoading.collectAsStateWithLifecycle()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -74,6 +84,8 @@ fun DashboardScreen(
                         currentAppScreen = AppScreen.EVENTS
                         selectedEventId = null
                         showAddEvent = false
+                        selectedOfferId = null
+                        showAddOffer = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -91,6 +103,8 @@ fun DashboardScreen(
                         currentAppScreen = AppScreen.OFFERS
                         selectedEventId = null
                         showAddEvent = false
+                        selectedOfferId = null
+                        showAddOffer = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -108,6 +122,8 @@ fun DashboardScreen(
                         currentAppScreen = AppScreen.CALENDAR
                         selectedEventId = null
                         showAddEvent = false
+                        selectedOfferId = null
+                        showAddOffer = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -142,14 +158,10 @@ fun DashboardScreen(
                         Text(
                             text = when {
                                 showAddEvent -> "Нов Настан"
+                                showAddOffer -> "Нова Понуда"
                                 selectedEventId != null -> "Детали"
-                                else -> when (currentAppScreen) {
-                                    AppScreen.HOME -> "Eventable"
-                                    AppScreen.EVENTS -> "Настани"
-                                    AppScreen.OFFERS -> "Понуди"
-                                    AppScreen.CALENDAR -> "Календар"
-                                    AppScreen.PROFILE -> "Профил"
-                                }
+                                selectedOfferId != null -> "Понуда"
+                                else -> "" // Тргнати се насловите од главната навигација за да нема дуплирање
                             },
                             fontWeight = FontWeight.ExtraBold,
                             color = PastelGreenDark
@@ -190,16 +202,18 @@ fun DashboardScreen(
                             Icon(
                                 Icons.Default.Home,
                                 contentDescription = "Home",
-                                tint = if (currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null)
+                                tint = if (currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null)
                                     PastelGreenDark else TextDark.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Home", fontSize = 11.sp) },
-                        selected = currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null,
+                        selected = currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null,
                         onClick = {
                             currentAppScreen = AppScreen.HOME
                             selectedEventId = null
                             showAddEvent = false
+                            selectedOfferId = null
+                            showAddOffer = false
                         },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PastelGreenDark,
@@ -222,6 +236,8 @@ fun DashboardScreen(
                             currentAppScreen = AppScreen.PROFILE
                             selectedEventId = null
                             showAddEvent = false
+                            selectedOfferId = null
+                            showAddOffer = false
                         },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PastelGreenDark,
@@ -239,6 +255,7 @@ fun DashboardScreen(
                     .padding(paddingValues)
             ) {
                 when {
+                    // --- НАВИГАЦИЈА ЗА НАСТАНИ ---
                     showAddEvent -> {
                         AddEventScreen(
                             eventViewModel = eventViewModel,
@@ -252,6 +269,33 @@ fun DashboardScreen(
                             onBack = { selectedEventId = null }
                         )
                     }
+
+                    // --- НАВИГАЦИЈА ЗА ПОНУДИ ---
+                    showAddOffer -> {
+                        AddOfferScreen(
+                            onSave = { title, content ->
+                                offerViewModel.addOffer(title, content) { showAddOffer = false }
+                            },
+                            onBack = { showAddOffer = false }
+                        )
+                    }
+                    selectedOfferId != null -> {
+                        val currentOffer = offers.find { it.id == selectedOfferId }
+                        OfferDetailScreen(
+                            offer = currentOffer,
+                            onUpdate = { updatedTitle, updatedContent ->
+                                offerViewModel.updateOffer(selectedOfferId!!, updatedTitle, updatedContent) {
+                                    // Автоматски се обновува преку SnapshotListener
+                                }
+                            },
+                            onDelete = {
+                                offerViewModel.deleteOffer(selectedOfferId!!) { selectedOfferId = null }
+                            },
+                            onBack = { selectedOfferId = null }
+                        )
+                    }
+
+                    // --- ГЛАВНИ ЕКРАНИ ---
                     else -> when (currentAppScreen) {
                         AppScreen.HOME -> HomeContent(eventViewModel = eventViewModel)
                         AppScreen.EVENTS -> EventsScreen(
@@ -260,7 +304,12 @@ fun DashboardScreen(
                             onAddEventClick = { showAddEvent = true },
                             onCalendarClick = { currentAppScreen = AppScreen.CALENDAR }
                         )
-                        AppScreen.OFFERS -> OffersPlaceholder()
+                        AppScreen.OFFERS -> OffersScreen(
+                            offers = offers,
+                            isLoading = isOffersLoading,
+                            onOfferClick = { id -> selectedOfferId = id },
+                            onAddOfferClick = { showAddOffer = true }
+                        )
                         AppScreen.CALENDAR -> CalendarPlaceholder()
                         AppScreen.PROFILE -> ProfilePlaceholder(
                             viewModel = viewModel,
@@ -372,13 +421,6 @@ fun HomeEventCard(event: Event) {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun OffersPlaceholder() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Понуди — наскоро", color = TextDark.copy(alpha = 0.4f), fontSize = 16.sp)
     }
 }
 

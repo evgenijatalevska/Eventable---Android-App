@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,83 +45,107 @@ fun EventsScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header
+            // --- ХЕДЕР СЕКЦИЈА СО НАСЛОВ, КАЛЕНДАР И ПРЕКЛОПЕНА КАРТИЧКА ---
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .wrapContentHeight()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.events_header),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        PastelGreenDark.copy(alpha = 0.5f),
-                                        PastelGreenPrimary.copy(alpha = 0.35f)
+                            .fillMaxWidth()
+                            .height(240.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.events_header),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            PastelGreenDark.copy(alpha = 0.6f),
+                                            PastelGreenPrimary.copy(alpha = 0.4f)
+                                        )
                                     )
                                 )
-                            )
-                    )
+                        )
 
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 20.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        // Копче за Календар — широко, над картичките
-                        Button(
-                            onClick = onCalendarClick,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White.copy(alpha = 0.25f)
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        // ПОПРАВКА: Спуштен наслов „Настани“ (променето од top = 20.dp во 40.dp)
+                        Text(
+                            text = "Настани",
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 20.dp, top = 40.dp)
+                        )
+
+                        // Копче за Календар — Подигнато погоре за подобар преглед
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 75.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_calendar),
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Отвори Календар",
-                                color = Color.White,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowForwardIos,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(14.dp)
+                            Button(
+                                onClick = onCalendarClick,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White.copy(alpha = 0.25f)
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_calendar),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Отвори Календар",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForwardIos,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // Првата картичка се позиционира ПОЛА на слика, ПОЛА на бело
+                    if (events.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                                .padding(top = 180.dp)
+                        ) {
+                            EventCardWhite(
+                                event = events.first(),
+                                onClick = { onEventClick(events.first().id) }
                             )
                         }
                     }
                 }
             }
 
-            // Prva karticka — offset нагоре
+            // --- ОСТАНАТИ ЕЛЕМЕНТИ ОД ЛИСТАТА ---
             if (events.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height((-30).dp))
-                    EventCardWhite(
-                        event = events.first(),
-                        onClick = { onEventClick(events.first().id) }
-                    )
-                }
-
                 items(events.drop(1)) { event ->
                     EventCardWhite(
                         event = event,
@@ -165,6 +191,7 @@ fun EventsScreen(
             item { Spacer(modifier = Modifier.height(80.dp)) }
         }
 
+        // Пловечко копче за додавање настан
         FloatingActionButton(
             onClick = onAddEventClick,
             modifier = Modifier
@@ -186,52 +213,82 @@ fun EventCardWhite(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .shadow(5.dp, RoundedCornerShape(16.dp))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(6.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
             .clickable { onClick() }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Text(
                 text = event.title,
-                fontSize = 17.sp,
+                fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextDark
             )
-            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Поголем датум и час со икони
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = event.date,
-                    fontSize = 13.sp,
-                    color = PastelGreenDark,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f)
-                )
+                // Датум
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = PastelGreenDark,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = event.date,
+                        fontSize = 15.sp,
+                        color = TextDark,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
                 Box(
                     modifier = Modifier
                         .width(1.dp)
-                        .height(16.dp)
+                        .height(20.dp)
                         .background(TextDark.copy(alpha = 0.15f))
                 )
-                Text(
-                    text = event.time,
-                    fontSize = 13.sp,
-                    color = PastelGreenDark,
-                    fontWeight = FontWeight.Medium,
+
+                // Час
+                Row(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 12.dp)
-                )
+                        .padding(start = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = PastelGreenDark,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = event.time,
+                        fontSize = 15.sp,
+                        color = TextDark,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
+
             if (event.offer.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = event.offer,
-                    fontSize = 12.sp,
+                    text = "Понуда: ${event.offer}",
+                    fontSize = 13.sp,
                     color = TextDark.copy(alpha = 0.5f)
                 )
             }

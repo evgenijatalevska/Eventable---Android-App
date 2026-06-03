@@ -2,22 +2,20 @@ package com.example.eventable.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.eventable.data.Event
+import com.example.eventable.data.Offer
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Locale
 
-class EventViewModel : ViewModel() {
+class OfferViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private val _events = MutableStateFlow<List<Event>>(emptyList())
-    val events: StateFlow<List<Event>> = _events
+    private val _offers = MutableStateFlow<List<Offer>>(emptyList())
+    val offers: StateFlow<List<Offer>> = _offers
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -26,36 +24,26 @@ class EventViewModel : ViewModel() {
     val errorMessage: StateFlow<String?> = _errorMessage
 
     init {
-        loadEvents()
+        loadOffers()
     }
 
-    fun loadEvents() {
+    fun loadOffers() {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                firestore.collection("events")
+                firestore.collection("offers")
                     .whereEqualTo("userId", uid)
                     .addSnapshotListener { snapshot, error ->
                         if (error != null) {
                             _errorMessage.value = "Грешка при вчитување: ${error.localizedMessage}"
                             return@addSnapshotListener
                         }
-                        val eventList = snapshot?.documents?.mapNotNull { doc ->
-                            doc.toObject(Event::class.java)?.copy(id = doc.id)
+                        val offerList = snapshot?.documents?.mapNotNull { doc ->
+                            doc.toObject(Offer::class.java)?.copy(id = doc.id)
                         } ?: emptyList()
 
-                        // Сортирање: Најблиските настани временски да бидат најгоре
-                        val dateTimeFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-                        _events.value = eventList.sortedWith { e1, e2 ->
-                            try {
-                                val d1 = dateTimeFormat.parse("${e1.date} ${e1.time}")
-                                val d2 = dateTimeFormat.parse("${e2.date} ${e2.time}")
-                                d1?.compareTo(d2) ?: 0
-                            } catch (e: Exception) {
-                                0
-                            }
-                        }
+                        _offers.value = offerList
                     }
             } catch (e: Exception) {
                 _errorMessage.value = "Грешка: ${e.localizedMessage}"
@@ -65,13 +53,13 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun addEvent(event: Event, onSuccess: () -> Unit) {
+    fun addOffer(title: String, content: String, onSuccess: () -> Unit) {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val newEvent = event.copy(userId = uid)
-                firestore.collection("events").add(newEvent).await()
+                val newOffer = Offer(userId = uid, title = title, content = content)
+                firestore.collection("offers").add(newOffer).await()
                 onSuccess()
             } catch (e: Exception) {
                 _errorMessage.value = "Грешка при додавање: ${e.localizedMessage}"
@@ -81,13 +69,15 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun updateEvent(event: Event, onSuccess: () -> Unit) {
+    fun updateOffer(offerId: String, title: String, content: String, onSuccess: () -> Unit) {
+        val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                firestore.collection("events")
-                    .document(event.id)
-                    .set(event)
+                val updatedOffer = Offer(id = offerId, userId = uid, title = title, content = content)
+                firestore.collection("offers")
+                    .document(offerId)
+                    .set(updatedOffer)
                     .await()
                 onSuccess()
             } catch (e: Exception) {
@@ -98,12 +88,12 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun deleteEvent(eventId: String, onSuccess: () -> Unit) {
+    fun deleteOffer(offerId: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                firestore.collection("events")
-                    .document(eventId)
+                firestore.collection("offers")
+                    .document(offerId)
                     .delete()
                     .await()
                 onSuccess()
