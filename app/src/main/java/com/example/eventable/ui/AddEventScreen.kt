@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventable.data.Event
 import com.example.eventable.ui.theme.*
@@ -29,10 +30,14 @@ import java.util.Calendar
 @Composable
 fun AddEventScreen(
     eventViewModel: EventViewModel = viewModel(),
+    offerViewModel: OfferViewModel = viewModel(), // Додаден OfferViewModel за паѓачкото мени
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
+    // Вчитување на понудите од OfferViewModel
+    val offers by offerViewModel.offers.collectAsStateWithLifecycle()
 
     var title by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
@@ -43,6 +48,9 @@ fun AddEventScreen(
     var food by remember { mutableStateOf("") }
     var additionalInfo by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf<String?>(null) }
+
+    // Контрола за паѓачкото мени
+    var offerExpanded by remember { mutableStateOf(false) }
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -156,11 +164,47 @@ fun AddEventScreen(
                 colors = textFieldColors()
             )
 
-            EventTextField(
-                value = selectedOffer,
-                onValueChange = { selectedOffer = it },
-                label = "Понуда"
-            )
+            // --- ПАЃАЧКО МЕНИ ЗА ИЗБОР НА ПОНУДА ---
+            ExposedDropdownMenuBox(
+                expanded = offerExpanded,
+                onExpandedChange = { offerExpanded = !offerExpanded }
+            ) {
+                OutlinedTextField(
+                    value = selectedOffer.ifEmpty { "Понуда" },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Понуда") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = offerExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = textFieldColors()
+                )
+                ExposedDropdownMenu(
+                    expanded = offerExpanded,
+                    onDismissRequest = { offerExpanded = false }
+                ) {
+                    // Опција за ресетирање / без понуда
+                    DropdownMenuItem(
+                        text = { Text("Без понуда", color = Color.Gray) },
+                        onClick = {
+                            selectedOffer = ""
+                            offerExpanded = false
+                        }
+                    )
+                    // Динамичко полнење од внесените понуди
+                    offers.forEach { offerItem ->
+                        DropdownMenuItem(
+                            text = { Text(offerItem.title) },
+                            onClick = {
+                                selectedOffer = offerItem.title
+                                offerExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             EventTextField(
                 value = adultsCount,

@@ -28,10 +28,14 @@ import com.example.eventable.ui.theme.*
 fun EventDetailScreen(
     eventId: String,
     eventViewModel: EventViewModel = viewModel(),
+    offerViewModel: OfferViewModel = viewModel(), // Додаден OfferViewModel за уредување
     onBack: () -> Unit
 ) {
     val events by eventViewModel.events.collectAsStateWithLifecycle()
     val event = events.find { it.id == eventId }
+
+    // Земи ги понудите за Dropdown менито
+    val offers by offerViewModel.offers.collectAsStateWithLifecycle()
 
     var isEditMode by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -45,6 +49,9 @@ fun EventDetailScreen(
     var childrenCount by remember(event) { mutableStateOf(event?.childrenCount?.toString() ?: "") }
     var food by remember(event) { mutableStateOf(event?.food ?: "") }
     var notes by remember(event) { mutableStateOf(event?.notes ?: "") }
+
+    // Контрола за отворање на паѓачкото мени во Edit режим
+    var offerExpanded by remember { mutableStateOf(false) }
 
     if (event == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -132,7 +139,47 @@ fun EventDetailScreen(
                 EventTextField(value = location, onValueChange = { location = it }, label = "Локација")
                 EventTextField(value = date, onValueChange = { date = it }, label = "Датум")
                 EventTextField(value = time, onValueChange = { time = it }, label = "Време")
-                EventTextField(value = offer, onValueChange = { offer = it }, label = "Понуда")
+
+                // --- ИЗБОР НА ПОНУДА ПРЕКУ DROP DOWN ВО EDIT РЕЖИМ ---
+                ExposedDropdownMenuBox(
+                    expanded = offerExpanded,
+                    onExpandedChange = { offerExpanded = !offerExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = offer.ifEmpty { "Понуда " },
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Понуда") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = offerExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = textFieldColors()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = offerExpanded,
+                        onDismissRequest = { offerExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Без понуда", color = Color.Gray) },
+                            onClick = {
+                                offer = ""
+                                offerExpanded = false
+                            }
+                        )
+                        offers.forEach { offerItem ->
+                            DropdownMenuItem(
+                                text = { Text(offerItem.title) },
+                                onClick = {
+                                    offer = offerItem.title
+                                    offerExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
                 EventTextField(value = adultsCount, onValueChange = { adultsCount = it }, label = "Број на возрасни", keyboardType = KeyboardType.Number)
                 EventTextField(value = childrenCount, onValueChange = { childrenCount = it }, label = "Број на деца", keyboardType = KeyboardType.Number)
                 EventTextField(value = food, onValueChange = { food = it }, label = "Храна")
@@ -176,23 +223,18 @@ fun EventDetailScreen(
                 }
 
             } else {
-                // --- VIEW MODE (НОВ КЛАСИЧЕН ДИЗАЈН ЕДНО ПОД ДРУГО) ---
+                // --- VIEW MODE ---
 
-                // Датум со зелена икона
                 DetailRowClean(
                     icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
                     text = event.date
                 )
 
-                // Време со зелена икона за часовник
                 DetailRowClean(
                     icon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
                     text = event.time
                 )
 
-                // Локација — комплетно тргната како што побара
-
-                // Понуда со зелено емоџи подарок 🎁
                 if (event.offer.isNotEmpty()) {
                     DetailRowClean(
                         icon = { Text("🎁", fontSize = 18.sp) },
@@ -200,7 +242,6 @@ fun EventDetailScreen(
                     )
                 }
 
-                // Број на возрасни со емоџи 👨
                 if (event.adultsCount > 0) {
                     DetailRowClean(
                         icon = { Text("👨", fontSize = 18.sp) },
@@ -208,7 +249,6 @@ fun EventDetailScreen(
                     )
                 }
 
-                // Број на деца со емоџи 👧
                 if (event.childrenCount > 0) {
                     DetailRowClean(
                         icon = { Text("👧", fontSize = 18.sp) },
@@ -216,7 +256,6 @@ fun EventDetailScreen(
                     )
                 }
 
-                // Храна — Насловот и вредноста надолу
                 if (event.food.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -233,7 +272,6 @@ fun EventDetailScreen(
                     }
                 }
 
-                // Белешки — Насловот и вредноста надолу
                 if (event.notes.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -254,7 +292,6 @@ fun EventDetailScreen(
     }
 }
 
-// Помошна мала компонента за чист приказ во еден ред
 @Composable
 fun DetailRowClean(
     icon: @Composable () -> Unit,
