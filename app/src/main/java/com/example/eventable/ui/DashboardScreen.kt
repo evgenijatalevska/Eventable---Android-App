@@ -1,6 +1,5 @@
 package com.example.eventable.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,11 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventable.data.Event
 import com.example.eventable.ui.theme.*
 import kotlinx.coroutines.launch
 
-// Екрани во навигацијата
 enum class AppScreen {
     HOME,
     EVENTS,
@@ -37,6 +37,9 @@ fun DashboardScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var currentAppScreen by remember { mutableStateOf(AppScreen.HOME) }
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+    var showAddEvent by remember { mutableStateOf(false) }
+    val eventViewModel: EventViewModel = viewModel()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -46,7 +49,6 @@ fun DashboardScreen(
                 drawerContainerColor = BackgroundWhite
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
-
                 Text(
                     text = "Eventable",
                     fontSize = 24.sp,
@@ -54,37 +56,24 @@ fun DashboardScreen(
                     color = PastelGreenDark,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                 )
-
                 Text(
                     text = "Главно мени",
                     fontSize = 12.sp,
                     color = TextDark.copy(alpha = 0.4f),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(color = TextDark.copy(alpha = 0.1f))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Настани
                 NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = null,
-                            tint = PastelGreenDark
-                        )
-                    },
-                    label = {
-                        Text(
-                            "Настани",
-                            fontWeight = FontWeight.Medium,
-                            color = TextDark
-                        )
-                    },
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = null, tint = PastelGreenDark) },
+                    label = { Text("Настани", fontWeight = FontWeight.Medium, color = TextDark) },
                     selected = currentAppScreen == AppScreen.EVENTS,
                     onClick = {
                         currentAppScreen = AppScreen.EVENTS
+                        selectedEventId = null
+                        showAddEvent = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -93,28 +82,15 @@ fun DashboardScreen(
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
-                // Понуди
                 NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            Icons.Default.Star,
-                            contentDescription = null,
-                            tint = PastelGreenDark
-                        )
-                    },
-                    label = {
-                        Text(
-                            "Понуди",
-                            fontWeight = FontWeight.Medium,
-                            color = TextDark
-                        )
-                    },
+                    icon = { Icon(Icons.Default.Star, contentDescription = null, tint = PastelGreenDark) },
+                    label = { Text("Понуди", fontWeight = FontWeight.Medium, color = TextDark) },
                     selected = currentAppScreen == AppScreen.OFFERS,
                     onClick = {
                         currentAppScreen = AppScreen.OFFERS
+                        selectedEventId = null
+                        showAddEvent = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -123,28 +99,15 @@ fun DashboardScreen(
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
-                // Календар
                 NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            Icons.Default.CalendarMonth,
-                            contentDescription = null,
-                            tint = PastelGreenDark
-                        )
-                    },
-                    label = {
-                        Text(
-                            "Календар",
-                            fontWeight = FontWeight.Medium,
-                            color = TextDark
-                        )
-                    },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PastelGreenDark) },
+                    label = { Text("Календар", fontWeight = FontWeight.Medium, color = TextDark) },
                     selected = currentAppScreen == AppScreen.CALENDAR,
                     onClick = {
                         currentAppScreen = AppScreen.CALENDAR
+                        selectedEventId = null
+                        showAddEvent = false
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -153,26 +116,11 @@ fun DashboardScreen(
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
                 HorizontalDivider(color = TextDark.copy(alpha = 0.1f))
-
-                // Одјава
                 NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            Icons.Default.ExitToApp,
-                            contentDescription = null,
-                            tint = Color.Red
-                        )
-                    },
-                    label = {
-                        Text(
-                            "Одјави се",
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Red
-                        )
-                    },
+                    icon = { Icon(Icons.Default.ExitToApp, contentDescription = null, tint = Color.Red) },
+                    label = { Text("Одјави се", fontWeight = FontWeight.Medium, color = Color.Red) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -192,20 +140,22 @@ fun DashboardScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = when (currentAppScreen) {
-                                AppScreen.HOME -> "Eventable"
-                                AppScreen.EVENTS -> "Настани"
-                                AppScreen.OFFERS -> "Понуди"
-                                AppScreen.CALENDAR -> "Календар"
-                                AppScreen.PROFILE -> "Профил"
+                            text = when {
+                                showAddEvent -> "Нов Настан"
+                                selectedEventId != null -> "Детали"
+                                else -> when (currentAppScreen) {
+                                    AppScreen.HOME -> "Eventable"
+                                    AppScreen.EVENTS -> "Настани"
+                                    AppScreen.OFFERS -> "Понуди"
+                                    AppScreen.CALENDAR -> "Календар"
+                                    AppScreen.PROFILE -> "Профил"
+                                }
                             },
                             fontWeight = FontWeight.ExtraBold,
                             color = PastelGreenDark
                         )
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = BackgroundWhite
-                    )
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
                 )
             },
             bottomBar = {
@@ -213,14 +163,12 @@ fun DashboardScreen(
                     containerColor = BackgroundWhite,
                     tonalElevation = 8.dp
                 ) {
-                    // Лево — Мени
                     NavigationBarItem(
                         icon = {
                             Icon(
                                 Icons.Default.Menu,
                                 contentDescription = "Мени",
-                                tint = if (drawerState.isOpen) PastelGreenDark
-                                else TextDark.copy(alpha = 0.5f)
+                                tint = if (drawerState.isOpen) PastelGreenDark else TextDark.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Мени", fontSize = 11.sp) },
@@ -237,28 +185,28 @@ fun DashboardScreen(
                             indicatorColor = PastelGreenPrimary.copy(alpha = 0.15f)
                         )
                     )
-
-                    // Средина — Home
                     NavigationBarItem(
                         icon = {
                             Icon(
                                 Icons.Default.Home,
                                 contentDescription = "Home",
-                                tint = if (currentAppScreen == AppScreen.HOME) PastelGreenDark
-                                else TextDark.copy(alpha = 0.5f)
+                                tint = if (currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null)
+                                    PastelGreenDark else TextDark.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Home", fontSize = 11.sp) },
-                        selected = currentAppScreen == AppScreen.HOME,
-                        onClick = { currentAppScreen = AppScreen.HOME },
+                        selected = currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null,
+                        onClick = {
+                            currentAppScreen = AppScreen.HOME
+                            selectedEventId = null
+                            showAddEvent = false
+                        },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PastelGreenDark,
                             selectedTextColor = PastelGreenDark,
                             indicatorColor = PastelGreenPrimary.copy(alpha = 0.15f)
                         )
                     )
-
-                    // Десно — Профил
                     NavigationBarItem(
                         icon = {
                             Icon(
@@ -270,7 +218,11 @@ fun DashboardScreen(
                         },
                         label = { Text("Профил", fontSize = 11.sp) },
                         selected = currentAppScreen == AppScreen.PROFILE,
-                        onClick = { currentAppScreen = AppScreen.PROFILE },
+                        onClick = {
+                            currentAppScreen = AppScreen.PROFILE
+                            selectedEventId = null
+                            showAddEvent = false
+                        },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PastelGreenDark,
                             selectedTextColor = PastelGreenDark,
@@ -286,29 +238,44 @@ fun DashboardScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                when (currentAppScreen) {
-                    AppScreen.HOME -> HomeContent()
-                    AppScreen.EVENTS -> EventsPlaceholder()
-                    AppScreen.OFFERS -> OffersPlaceholder()
-                    AppScreen.CALENDAR -> CalendarPlaceholder()
-                    AppScreen.PROFILE -> ProfilePlaceholder(
-                        viewModel = viewModel,
-                        onLogoutSuccess = onLogoutSuccess
-                    )
+                when {
+                    showAddEvent -> {
+                        AddEventScreen(
+                            eventViewModel = eventViewModel,
+                            onBack = { showAddEvent = false }
+                        )
+                    }
+                    selectedEventId != null -> {
+                        EventDetailScreen(
+                            eventId = selectedEventId!!,
+                            eventViewModel = eventViewModel,
+                            onBack = { selectedEventId = null }
+                        )
+                    }
+                    else -> when (currentAppScreen) {
+                        AppScreen.HOME -> HomeContent(eventViewModel = eventViewModel)
+                        AppScreen.EVENTS -> EventsScreen(
+                            eventViewModel = eventViewModel,
+                            onEventClick = { id -> selectedEventId = id },
+                            onAddEventClick = { showAddEvent = true },
+                            onCalendarClick = { currentAppScreen = AppScreen.CALENDAR }
+                        )
+                        AppScreen.OFFERS -> OffersPlaceholder()
+                        AppScreen.CALENDAR -> CalendarPlaceholder()
+                        AppScreen.PROFILE -> ProfilePlaceholder(
+                            viewModel = viewModel,
+                            onLogoutSuccess = onLogoutSuccess
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-// ---- HOME CONTENT ----
 @Composable
-fun HomeContent() {
-    val dummyEvents = listOf(
-        Event("1", "7-ми Роденден на Марко", "Игротека 'Бајка'", "26 Мај, 2026", "18:00", PastelGreenPrimary.copy(alpha = 0.2f)),
-        Event("2", "Крштевка и 1-ви Роденден", "Игротека 'Ѕвездички'", "30 Мај, 2026", "12:30", Color(0xFFE3F2FD)),
-        Event("3", "Тинејџерска забава - Ема", "Лаунџ Бар Тренд", "05 Јуни, 2026", "20:00", Color(0xFFF3E5F5))
-    )
+fun HomeContent(eventViewModel: EventViewModel = viewModel()) {
+    val events by eventViewModel.events.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = Modifier
@@ -338,18 +305,73 @@ fun HomeContent() {
                 modifier = Modifier.padding(bottom = 4.dp)
             )
         }
-        items(dummyEvents) { event ->
-            EventCard(event = event)
+        if (events.isEmpty()) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Нема настани сè уште",
+                        color = TextDark.copy(alpha = 0.4f),
+                        fontSize = 15.sp
+                    )
+                }
+            }
+        } else {
+            items(events) { event ->
+                HomeEventCard(event = event)
+            }
         }
         item { Spacer(modifier = Modifier.height(8.dp)) }
     }
 }
 
-// ---- PLACEHOLDER ЕКРАНИ ----
 @Composable
-fun EventsPlaceholder() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Настани — наскоро", color = TextDark.copy(alpha = 0.4f), fontSize = 16.sp)
+fun HomeEventCard(event: Event) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = PastelGreenPrimary.copy(alpha = 0.12f)
+        ),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = event.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextDark
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            if (event.location.isNotEmpty()) {
+                Text(
+                    text = "📍 ${event.location}",
+                    fontSize = 14.sp,
+                    color = TextDark.copy(alpha = 0.7f)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "📅 ${event.date}",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = PastelGreenDark
+                )
+                Text(
+                    text = "🕒 ${event.time}",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = PastelGreenDark
+                )
+            }
+        }
     }
 }
 
@@ -377,12 +399,13 @@ fun ProfilePlaceholder(
     }
 }
 
-// ---- EVENT CARD ----
 @Composable
 fun EventCard(event: Event) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = event.cardColor),
+        colors = CardDefaults.cardColors(
+            containerColor = PastelGreenPrimary.copy(alpha = 0.12f)
+        ),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
