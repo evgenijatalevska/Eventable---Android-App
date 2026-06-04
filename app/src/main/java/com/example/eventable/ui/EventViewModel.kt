@@ -46,7 +46,8 @@ class EventViewModel : ViewModel() {
                         } ?: emptyList()
 
                         // Сортирање: Најблиските настани временски да бидат најгоре
-                        val dateTimeFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                        val dateTimeFormat =
+                            SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
                         _events.value = eventList.sortedWith { e1, e2 ->
                             try {
                                 val d1 = dateTimeFormat.parse("${e1.date} ${e1.time}")
@@ -111,6 +112,20 @@ class EventViewModel : ViewModel() {
                 _errorMessage.value = "Грешка при бришење: ${e.localizedMessage}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+
+    fun markAddedToCalendar(eventId: String) {
+        viewModelScope.launch {
+            try {
+                firestore.collection("events")
+                    .document(eventId)
+                    .update("addedToCalendar", true)
+                    .await()
+            } catch (e: Exception) {
+                // handle error
             }
         }
     }

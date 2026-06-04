@@ -11,5 +11,6 @@ data class Event(
     val childrenCount: Int = 0,
     val food: String = "",
     val notes: String = "",
-    val userId: String = ""
+    val userId: String = "",
+    val addedToCalendar: Boolean = false
 )

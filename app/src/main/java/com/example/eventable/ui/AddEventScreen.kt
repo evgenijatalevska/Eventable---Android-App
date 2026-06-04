@@ -30,13 +30,12 @@ import java.util.Calendar
 @Composable
 fun AddEventScreen(
     eventViewModel: EventViewModel = viewModel(),
-    offerViewModel: OfferViewModel = viewModel(), // Додаден OfferViewModel за паѓачкото мени
+    offerViewModel: OfferViewModel = viewModel(),
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    // Вчитување на понудите од OfferViewModel
     val offers by offerViewModel.offers.collectAsStateWithLifecycle()
 
     var title by remember { mutableStateOf("") }
@@ -48,8 +47,6 @@ fun AddEventScreen(
     var food by remember { mutableStateOf("") }
     var additionalInfo by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf<String?>(null) }
-
-    // Контрола за паѓачкото мени
     var offerExpanded by remember { mutableStateOf(false) }
 
     val datePickerDialog = DatePickerDialog(
@@ -164,7 +161,6 @@ fun AddEventScreen(
                 colors = textFieldColors()
             )
 
-            // --- ПАЃАЧКО МЕНИ ЗА ИЗБОР НА ПОНУДА ---
             ExposedDropdownMenuBox(
                 expanded = offerExpanded,
                 onExpandedChange = { offerExpanded = !offerExpanded }
@@ -185,7 +181,6 @@ fun AddEventScreen(
                     expanded = offerExpanded,
                     onDismissRequest = { offerExpanded = false }
                 ) {
-                    // Опција за ресетирање / без понуда
                     DropdownMenuItem(
                         text = { Text("Без понуда", color = Color.Gray) },
                         onClick = {
@@ -193,7 +188,6 @@ fun AddEventScreen(
                             offerExpanded = false
                         }
                     )
-                    // Динамичко полнење од внесените понуди
                     offers.forEach { offerItem ->
                         DropdownMenuItem(
                             text = { Text(offerItem.title) },
@@ -262,6 +256,8 @@ fun AddEventScreen(
                         errorMsg = "Изберете време."
                         return@Button
                     }
+
+                    // Креирање на настанот со addedToCalendar = true
                     val event = Event(
                         title = title,
                         date = date,
@@ -270,9 +266,14 @@ fun AddEventScreen(
                         adultsCount = adultsCount.toIntOrNull() ?: 0,
                         childrenCount = childrenCount.toIntOrNull() ?: 0,
                         food = food,
-                        notes = additionalInfo
+                        notes = additionalInfo,
+                        addedToCalendar = true // Измената е тука!
                     )
-                    eventViewModel.addEvent(event) { onBack() }
+
+                    eventViewModel.addEvent(event) {
+                        addEventToGoogleCalendar(context, event)
+                        onBack()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

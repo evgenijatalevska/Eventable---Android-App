@@ -38,12 +38,10 @@ fun DashboardScreen(
     val scope = rememberCoroutineScope()
     var currentAppScreen by remember { mutableStateOf(AppScreen.HOME) }
 
-    // Состојби за Настани
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var showAddEvent by remember { mutableStateOf(false) }
     val eventViewModel: EventViewModel = viewModel()
 
-    // Состојби за Понуди
     var selectedOfferId by remember { mutableStateOf<String?>(null) }
     var showAddOffer by remember { mutableStateOf(false) }
     val offerViewModel: OfferViewModel = viewModel()
@@ -161,7 +159,7 @@ fun DashboardScreen(
                                 showAddOffer -> "Нова Понуда"
                                 selectedEventId != null -> "Детали"
                                 selectedOfferId != null -> "Понуда"
-                                else -> "" // Тргнати се насловите од главната навигација за да нема дуплирање
+                                else -> ""
                             },
                             fontWeight = FontWeight.ExtraBold,
                             color = PastelGreenDark
@@ -255,7 +253,6 @@ fun DashboardScreen(
                     .padding(paddingValues)
             ) {
                 when {
-                    // --- НАВИГАЦИЈА ЗА НАСТАНИ ---
                     showAddEvent -> {
                         AddEventScreen(
                             eventViewModel = eventViewModel,
@@ -269,8 +266,6 @@ fun DashboardScreen(
                             onBack = { selectedEventId = null }
                         )
                     }
-
-                    // --- НАВИГАЦИЈА ЗА ПОНУДИ ---
                     showAddOffer -> {
                         AddOfferScreen(
                             onSave = { title, content ->
@@ -284,9 +279,7 @@ fun DashboardScreen(
                         OfferDetailScreen(
                             offer = currentOffer,
                             onUpdate = { updatedTitle, updatedContent ->
-                                offerViewModel.updateOffer(selectedOfferId!!, updatedTitle, updatedContent) {
-                                    // Автоматски се обновува преку SnapshotListener
-                                }
+                                offerViewModel.updateOffer(selectedOfferId!!, updatedTitle, updatedContent) {}
                             },
                             onDelete = {
                                 offerViewModel.deleteOffer(selectedOfferId!!) { selectedOfferId = null }
@@ -294,8 +287,6 @@ fun DashboardScreen(
                             onBack = { selectedOfferId = null }
                         )
                     }
-
-                    // --- ГЛАВНИ ЕКРАНИ ---
                     else -> when (currentAppScreen) {
                         AppScreen.HOME -> HomeContent(eventViewModel = eventViewModel)
                         AppScreen.EVENTS -> EventsScreen(
@@ -310,7 +301,11 @@ fun DashboardScreen(
                             onOfferClick = { id -> selectedOfferId = id },
                             onAddOfferClick = { showAddOffer = true }
                         )
-                        AppScreen.CALENDAR -> CalendarPlaceholder()
+                        AppScreen.CALENDAR -> CalendarScreen(
+                            eventViewModel = eventViewModel,
+                            onEventClick = { id -> selectedEventId = id },
+                            onAddEventClick = { showAddEvent = true }
+                        )
                         AppScreen.PROFILE -> ProfilePlaceholder(
                             viewModel = viewModel,
                             onLogoutSuccess = onLogoutSuccess
@@ -421,13 +416,6 @@ fun HomeEventCard(event: Event) {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun CalendarPlaceholder() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Календар — наскоро", color = TextDark.copy(alpha = 0.4f), fontSize = 16.sp)
     }
 }
 
