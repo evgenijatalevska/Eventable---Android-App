@@ -10,6 +10,9 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,13 +31,12 @@ import com.example.eventable.ui.theme.*
 fun EventDetailScreen(
     eventId: String,
     eventViewModel: EventViewModel = viewModel(),
-    offerViewModel: OfferViewModel = viewModel(), // Додаден OfferViewModel за уредување
+    offerViewModel: OfferViewModel = viewModel(),
     onBack: () -> Unit
 ) {
     val events by eventViewModel.events.collectAsStateWithLifecycle()
     val event = events.find { it.id == eventId }
 
-    // Земи ги понудите за Dropdown менито
     val offers by offerViewModel.offers.collectAsStateWithLifecycle()
 
     var isEditMode by remember { mutableStateOf(false) }
@@ -50,7 +52,6 @@ fun EventDetailScreen(
     var food by remember(event) { mutableStateOf(event?.food ?: "") }
     var notes by remember(event) { mutableStateOf(event?.notes ?: "") }
 
-    // Контрола за отворање на паѓачкото мени во Edit режим
     var offerExpanded by remember { mutableStateOf(false) }
 
     if (event == null) {
@@ -146,7 +147,7 @@ fun EventDetailScreen(
                     onExpandedChange = { offerExpanded = !offerExpanded }
                 ) {
                     OutlinedTextField(
-                        value = offer.ifEmpty { "Понуда " },
+                        value = offer.ifEmpty { "Понуда" },
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Понуда") },
@@ -155,6 +156,10 @@ fun EventDetailScreen(
                             .fillMaxWidth()
                             .menuAnchor(),
                         shape = RoundedCornerShape(12.dp),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            color = if (offer.isEmpty()) TextDark.copy(alpha = 0.4f) else TextDark,
+                            fontSize = 16.sp
+                        ),
                         colors = textFieldColors()
                     )
                     ExposedDropdownMenu(
@@ -182,7 +187,9 @@ fun EventDetailScreen(
 
                 EventTextField(value = adultsCount, onValueChange = { adultsCount = it }, label = "Број на возрасни", keyboardType = KeyboardType.Number)
                 EventTextField(value = childrenCount, onValueChange = { childrenCount = it }, label = "Број на деца", keyboardType = KeyboardType.Number)
-                EventTextField(value = food, onValueChange = { food = it }, label = "Храна")
+
+                // Измена: Храната сега поддржува повеќе линии исто како белешките
+                EventTextField(value = food, onValueChange = { food = it }, label = "Храна", singleLine = false, minLines = 3)
                 EventTextField(value = notes, onValueChange = { notes = it }, label = "Белешки", singleLine = false, minLines = 3)
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -237,21 +244,21 @@ fun EventDetailScreen(
 
                 if (event.offer.isNotEmpty()) {
                     DetailRowClean(
-                        icon = { Text("🎁", fontSize = 18.sp) },
+                        icon = { Icon(Icons.Default.Star, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
                         text = "Понуда: ${event.offer}"
                     )
                 }
 
                 if (event.adultsCount > 0) {
                     DetailRowClean(
-                        icon = { Text("👨", fontSize = 18.sp) },
+                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
                         text = "Број на возрасни: ${event.adultsCount}"
                     )
                 }
 
                 if (event.childrenCount > 0) {
                     DetailRowClean(
-                        icon = { Text("👧", fontSize = 18.sp) },
+                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(16.dp)) },
                         text = "Број на деца: ${event.childrenCount}"
                     )
                 }
@@ -259,7 +266,7 @@ fun EventDetailScreen(
                 if (event.food.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("🍕", fontSize = 18.sp)
+                            Icon(Icons.Default.List, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Храна:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
                         }
@@ -275,7 +282,7 @@ fun EventDetailScreen(
                 if (event.notes.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("📝", fontSize = 18.sp)
+                            Icon(Icons.Default.Edit, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Белешки:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
                         }
