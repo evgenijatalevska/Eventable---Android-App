@@ -44,6 +44,49 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    // Помошна функција за локално активирање на поп-ап нотификацијата со висок приоритет
+    private fun triggerRegistrationNotification() {
+        val context = com.google.firebase.FirebaseApp.getInstance().applicationContext
+        val sharedPreferences = context.getSharedPreferences("app_settings", android.content.Context.MODE_PRIVATE)
+        val notificationsEnabled = sharedPreferences.getBoolean("notifications_enabled", true)
+
+        if (notificationsEnabled) {
+            val notificationIntent = android.content.Intent(context, com.example.eventable.MainActivity::class.java).apply {
+                addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            val pendingIntent = android.app.PendingIntent.getActivity(
+                context, 0, notificationIntent,
+                android.app.PendingIntent.FLAG_ONE_SHOT or android.app.PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val channelId = "eventable_notifications_channel"
+            val notificationManager = context.getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val channel = android.app.NotificationChannel(
+                    channelId,
+                    "Eventable Известувања",
+                    android.app.NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    enableLights(true)
+                    enableVibration(true)
+                }
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val notificationBuilder = androidx.core.app.NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(com.example.eventable.R.drawable.logo) // 🔔 СМЕНЕТО: Се користи твоето сопствено лого од drawable
+                .setContentTitle("Успешна регистрација! 🎉")
+                .setContentText("Добредојдовте во Eventable. Вашиот профил е креиран.")
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_MAX) // Максимален приоритет за поп-ап банер
+                .setDefaults(androidx.core.app.NotificationCompat.DEFAULT_ALL)
+
+            notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
+        }
+    }
+
     // 📥 Вчитување на податоците од Firestore за најавениот корисник
     fun loadUserProfile() {
         val uid = auth.currentUser?.uid ?: return
@@ -159,6 +202,9 @@ class AuthViewModel : ViewModel() {
                 )
                 firestore.collection("users").document(uid).set(user).await()
 
+                // 🔔 Известување за успешна е-маил регистрација
+                triggerRegistrationNotification()
+
                 auth.signOut()
                 _isUserLoggedIn.value = false
                 onSuccess()
@@ -177,7 +223,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    // 3. Анонимна најава
+    // 3. Анонимна најава (Гостин - ТУКА НЕМА НОТИФИКАЦИЈА)
     fun signInAnonymously(onSuccess: () -> Unit) {
         viewModelScope.launch {
             isLoading.value = true
@@ -201,7 +247,28 @@ class AuthViewModel : ViewModel() {
             errorMessage.value = null
             try {
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
-                auth.signInWithCredential(credential).await()
+                val result = auth.signInWithCredential(credential).await()
+
+                // Проверуваме дали е нов корисник (односно првпат се регистрира со Google)
+                if (result.additionalUserInfo?.isNewUser == true) {
+                    val userObj = result.user
+                    if (userObj != null) {
+                        val uid = userObj.uid
+                        val user = hashMapOf(
+                            "uid" to uid,
+                            "firstName" to (userObj.displayName?.split(" ")?.getOrNull(0) ?: ""),
+                            "lastName" to (userObj.displayName?.split(" ")?.getOrNull(1) ?: ""),
+                            "companyName" to "",
+                            "email" to (userObj.email ?: ""),
+                            "createdAt" to System.currentTimeMillis()
+                        )
+                        firestore.collection("users").document(uid).set(user).await()
+
+                        // 🔔 Повикај ја нотификацијата бидејќи ова е нова регистрација
+                        triggerRegistrationNotification()
+                    }
+                }
+
                 _isUserLoggedIn.value = true
                 onSuccess()
             } catch (e: Exception) {
@@ -219,7 +286,28 @@ class AuthViewModel : ViewModel() {
             errorMessage.value = null
             try {
                 val credential = FacebookAuthProvider.getCredential(token)
-                auth.signInWithCredential(credential).await()
+                val result = auth.signInWithCredential(credential).await()
+
+                // Проверуваме дали е нов корисник (првпат се регистрира со Facebook)
+                if (result.additionalUserInfo?.isNewUser == true) {
+                    val userObj = result.user
+                    if (userObj != null) {
+                        val uid = userObj.uid
+                        val user = hashMapOf(
+                            "uid" to uid,
+                            "firstName" to (userObj.displayName?.split(" ")?.getOrNull(0) ?: ""),
+                            "lastName" to (userObj.displayName?.split(" ")?.getOrNull(1) ?: ""),
+                            "companyName" to "",
+                            "email" to (userObj.email ?: ""),
+                            "createdAt" to System.currentTimeMillis()
+                        )
+                        firestore.collection("users").document(uid).set(user).await()
+
+                        // 🔔 Повикај ја нотификацијата бидејќи ова е нова регистрација
+                        triggerRegistrationNotification()
+                    }
+                }
+
                 _isUserLoggedIn.value = true
                 onSuccess()
             } catch (e: Exception) {

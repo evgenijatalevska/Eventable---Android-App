@@ -1,9 +1,13 @@
 package com.example.eventable
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
         callbackManager = CallbackManager.Factory.create()
 
-            setContent {
+        setContent {
             EventableTheme {
                 val isLoggedIn by authViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
@@ -39,6 +43,19 @@ class MainActivity : ComponentActivity() {
                         if (authViewModel.isUserLoggedIn.value) Screen.DASHBOARD
                         else Screen.LOGIN
                     )
+                }
+
+                // 🔔 Автоматско барање дозвола за нотификации кај Android 13+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    // Овде може да се обработи дали корисникот прифатил или одбил (по желба)
+                }
+
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
                 }
 
                 LaunchedEffect(isLoggedIn) {

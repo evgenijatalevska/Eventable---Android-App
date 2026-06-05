@@ -1,5 +1,6 @@
 package com.example.eventable.ui
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,9 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,12 +37,27 @@ fun ProfileScreen(
     onNotificationsClick: () -> Unit,
     onLogoutSuccess: () -> Unit
 ) {
+    val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
     val userEmail = currentUser?.email ?: "Нема е-маил"
 
     // Динамичко земање на вредностите директно од ViewModel
     val companyName by remember { authViewModel.companyNameState }
     val profileImageUri by remember { authViewModel.profileImageUriState }
+
+    // Следење на состојбата на нотификациите за динамичен поднаслов
+    var isNotificationsEnabled by remember {
+        mutableStateOf(
+            context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+                .getBoolean("notifications_enabled", true)
+        )
+    }
+
+    // Секогаш кога корисникот ќе се врати на овој екран, ја освежуваме состојбата
+    LaunchedEffect(Unit) {
+        isNotificationsEnabled = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+            .getBoolean("notifications_enabled", true)
+    }
 
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
@@ -81,7 +96,6 @@ fun ProfileScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Динамична профилна слика
                     Box(
                         modifier = Modifier
                             .size(96.dp)
@@ -109,7 +123,6 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    // Динамично име на игротека/компанија
                     Text(
                         text = companyName.ifEmpty { "Име на игротека" },
                         fontSize = 20.sp,
@@ -165,7 +178,7 @@ fun ProfileScreen(
                     ProfileMenuRow(
                         icon = Icons.Default.Notifications,
                         title = "Нотификации",
-                        subtitle = "Вклучени",
+                        subtitle = if (isNotificationsEnabled) "Вклучени" else "Исклучени", // Динамички поднасловови
                         onClick = onNotificationsClick
                     )
                 }
@@ -199,7 +212,7 @@ fun ProfileScreen(
                         title = "Избриши Акаунт",
                         titleColor = Color.Red,
                         iconTint = Color.Red,
-                        onClick = { /* TODO: Бришење во Firebase Auth */ }
+                        onClick = { /* TODO */ }
                     )
                 }
             }
@@ -250,17 +263,94 @@ fun LanguageScreen(onBack: () -> Unit) {
     ) { p -> Box(Modifier.padding(p).fillMaxSize()) { Text("Опции за промена на јазик (MK / EN).", Modifier.padding(16.dp)) } }
 }
 
+// =====================================================
+// 🔔 ЦЕЛОСНО ФУНКЦИОНАЛЕН ЕКРАН ЗА НОТИФИКАЦИИ
+// =====================================================
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("app_settings", Context.MODE_PRIVATE) }
+
+    // Вчитување на зачуваната состојба (по дефолт е true)
+    var isChecked by remember { mutableStateOf(sharedPreferences.getBoolean("notifications_enabled", true)) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Нотификации", fontWeight = FontWeight.Bold, color = PastelGreenDark) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад", tint = PastelGreenDark) } },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, "Назад", tint = PastelGreenDark)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
             )
         },
         containerColor = BackgroundWhite
-    ) { p -> Box(Modifier.padding(p).fillMaxSize()) { Text("Подесувања за Пуш-нотификации и потсетници.", Modifier.padding(16.dp)) } }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Подеси ги твоите известувања",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Пуш Нотификации",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextDark
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Примај потсетници за претстојните настани на денот на настанот.",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            lineHeight = 16.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Копче прекинувач (Switch) за палење/гасење на FCM нотификациите
+                    Switch(
+                        checked = isChecked,
+                        onCheckedChange = { value ->
+                            isChecked = value
+                            // Трајно зачувување на изборот во SharedPreferences
+                            sharedPreferences.edit().putBoolean("notifications_enabled", value).apply()
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = PastelGreenPrimary,
+                            uncheckedThumbColor = Color.Gray,
+                            uncheckedTrackColor = Color.LightGray.copy(alpha = 0.5f)
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
