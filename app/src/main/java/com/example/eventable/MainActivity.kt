@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 
         callbackManager = CallbackManager.Factory.create()
 
-        setContent {
+            setContent {
             EventableTheme {
                 val isLoggedIn by authViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 

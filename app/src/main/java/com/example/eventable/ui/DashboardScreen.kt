@@ -28,6 +28,14 @@ enum class AppScreen {
     PROFILE
 }
 
+// 📌 Енум кој совршено одговара за менаџирање на твоите под-екрани
+enum class ProfileSubScreen {
+    MAIN,
+    EDIT,
+    LANGUAGE,
+    NOTIFICATIONS
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
@@ -38,10 +46,19 @@ fun DashboardScreen(
     val scope = rememberCoroutineScope()
     var currentAppScreen by remember { mutableStateOf(AppScreen.HOME) }
 
+    // Состојба за под-екраните на профилот
+    var currentProfileSubScreen by remember { mutableStateOf(ProfileSubScreen.MAIN) }
+
+    // Состојби за Настани
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var showAddEvent by remember { mutableStateOf(false) }
     val eventViewModel: EventViewModel = viewModel()
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        eventViewModel.initLocalRepo(context)
+    }
+    // Состојби за Понуди
     var selectedOfferId by remember { mutableStateOf<String?>(null) }
     var showAddOffer by remember { mutableStateOf(false) }
     val offerViewModel: OfferViewModel = viewModel()
@@ -80,6 +97,7 @@ fun DashboardScreen(
                     selected = currentAppScreen == AppScreen.EVENTS,
                     onClick = {
                         currentAppScreen = AppScreen.EVENTS
+                        currentProfileSubScreen = ProfileSubScreen.MAIN
                         selectedEventId = null
                         showAddEvent = false
                         selectedOfferId = null
@@ -99,6 +117,7 @@ fun DashboardScreen(
                     selected = currentAppScreen == AppScreen.OFFERS,
                     onClick = {
                         currentAppScreen = AppScreen.OFFERS
+                        currentProfileSubScreen = ProfileSubScreen.MAIN
                         selectedEventId = null
                         showAddEvent = false
                         selectedOfferId = null
@@ -118,6 +137,7 @@ fun DashboardScreen(
                     selected = currentAppScreen == AppScreen.CALENDAR,
                     onClick = {
                         currentAppScreen = AppScreen.CALENDAR
+                        currentProfileSubScreen = ProfileSubScreen.MAIN
                         selectedEventId = null
                         showAddEvent = false
                         selectedOfferId = null
@@ -151,22 +171,26 @@ fun DashboardScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = when {
-                                showAddEvent -> "Нов Настан"
-                                showAddOffer -> "Нова Понуда"
-                                selectedEventId != null -> "Детали"
-                                selectedOfferId != null -> "Понуда"
-                                else -> ""
-                            },
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PastelGreenDark
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
-                )
+                // ⚠️ КРИТИЧНО МЕСТO: Го прикажуваме заглавието САМО ако сме на главниот екран на профилот.
+                // Ако се отвори некој од под-екраните, тие си имаат свој TopAppBar и овој тука се крие.
+                if (currentAppScreen != AppScreen.PROFILE || currentProfileSubScreen == ProfileSubScreen.MAIN) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = when {
+                                    showAddEvent -> "Нов Настан"
+                                    showAddOffer -> "Нова Понуда"
+                                    selectedEventId != null -> "Детали"
+                                    selectedOfferId != null -> "Понуда"
+                                    else -> ""
+                                },
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PastelGreenDark
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                    )
+                }
             },
             bottomBar = {
                 NavigationBar(
@@ -208,6 +232,7 @@ fun DashboardScreen(
                         selected = currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null,
                         onClick = {
                             currentAppScreen = AppScreen.HOME
+                            currentProfileSubScreen = ProfileSubScreen.MAIN
                             selectedEventId = null
                             showAddEvent = false
                             selectedOfferId = null
@@ -232,6 +257,7 @@ fun DashboardScreen(
                         selected = currentAppScreen == AppScreen.PROFILE,
                         onClick = {
                             currentAppScreen = AppScreen.PROFILE
+                            currentProfileSubScreen = ProfileSubScreen.MAIN // Секогаш ресетирај на главниот приказ кога ќе кликнат на табот
                             selectedEventId = null
                             showAddEvent = false
                             selectedOfferId = null
@@ -253,6 +279,7 @@ fun DashboardScreen(
                     .padding(paddingValues)
             ) {
                 when {
+                    // --- НАВИГАЦИЈА ЗА НАСТАНИ ---
                     showAddEvent -> {
                         AddEventScreen(
                             eventViewModel = eventViewModel,
@@ -266,6 +293,8 @@ fun DashboardScreen(
                             onBack = { selectedEventId = null }
                         )
                     }
+
+                    // --- НАВИГАЦИЈА ЗА ПОНУДИ ---
                     showAddOffer -> {
                         AddOfferScreen(
                             onSave = { title, content ->
@@ -279,7 +308,7 @@ fun DashboardScreen(
                         OfferDetailScreen(
                             offer = currentOffer,
                             onUpdate = { updatedTitle, updatedContent ->
-                                offerViewModel.updateOffer(selectedOfferId!!, updatedTitle, updatedContent) {}
+                                offerViewModel.updateOffer(selectedOfferId!!, updatedTitle, updatedContent) { }
                             },
                             onDelete = {
                                 offerViewModel.deleteOffer(selectedOfferId!!) { selectedOfferId = null }
@@ -287,6 +316,8 @@ fun DashboardScreen(
                             onBack = { selectedOfferId = null }
                         )
                     }
+
+                    // --- ГЛАВНИ ЕКРАНИ ---
                     else -> when (currentAppScreen) {
                         AppScreen.HOME -> HomeContent(eventViewModel = eventViewModel)
                         AppScreen.EVENTS -> EventsScreen(
@@ -301,15 +332,23 @@ fun DashboardScreen(
                             onOfferClick = { id -> selectedOfferId = id },
                             onAddOfferClick = { showAddOffer = true }
                         )
-                        AppScreen.CALENDAR -> CalendarScreen(
-                            eventViewModel = eventViewModel,
-                            onEventClick = { id -> selectedEventId = id },
-                            onAddEventClick = { showAddEvent = true }
-                        )
-                        AppScreen.PROFILE -> ProfilePlaceholder(
-                            viewModel = viewModel,
-                            onLogoutSuccess = onLogoutSuccess
-                        )
+                        AppScreen.CALENDAR -> CalendarScreen(eventViewModel = eventViewModel)
+
+                        // --- 👤 НАВИГАЦИЈА НИЗ ПРОФИЛОТ (Поврзано со ProfileScreen.kt) ---
+                        AppScreen.PROFILE -> when (currentProfileSubScreen) {
+                            ProfileSubScreen.MAIN -> {
+                                ProfileScreen(
+                                    authViewModel = viewModel,
+                                    onEditProfileClick = { currentProfileSubScreen = ProfileSubScreen.EDIT },
+                                    onLanguageClick = { currentProfileSubScreen = ProfileSubScreen.LANGUAGE },
+                                    onNotificationsClick = { currentProfileSubScreen = ProfileSubScreen.NOTIFICATIONS },
+                                    onLogoutSuccess = onLogoutSuccess
+                                )
+                            }
+                            ProfileSubScreen.EDIT -> EditProfileScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
+                            ProfileSubScreen.LANGUAGE -> LanguageScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
+                            ProfileSubScreen.NOTIFICATIONS -> NotificationsScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
+                        }
                     }
                 }
             }
@@ -329,39 +368,19 @@ fun HomeContent(eventViewModel: EventViewModel = viewModel()) {
     ) {
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "Здраво! 👋",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextDark
-            )
+            Text(text = "Здраво! 👋", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = TextDark)
             Text(
                 text = "Еве ги твоите претстојни настани.",
                 fontSize = 14.sp,
                 color = TextDark.copy(alpha = 0.6f),
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
-            Text(
-                text = "Претстојни Настани",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextDark,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            Text(text = "Претстојни Настани", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = TextDark, modifier = Modifier.padding(bottom = 4.dp))
         }
         if (events.isEmpty()) {
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Нема настани сè уште",
-                        color = TextDark.copy(alpha = 0.4f),
-                        fontSize = 15.sp
-                    )
+                Box(modifier = Modifier.fillMaxWidth().padding(top = 32.dp), contentAlignment = Alignment.Center) {
+                    Text(text = "Нема настани сè уште", color = TextDark.copy(alpha = 0.4f), fontSize = 15.sp)
                 }
             }
         } else {
@@ -377,55 +396,21 @@ fun HomeContent(eventViewModel: EventViewModel = viewModel()) {
 fun HomeEventCard(event: Event) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = PastelGreenPrimary.copy(alpha = 0.12f)
-        ),
+        colors = CardDefaults.cardColors(containerColor = PastelGreenPrimary.copy(alpha = 0.12f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = event.title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextDark
-            )
+            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
             Spacer(modifier = Modifier.height(4.dp))
             if (event.location.isNotEmpty()) {
-                Text(
-                    text = "📍 ${event.location}",
-                    fontSize = 14.sp,
-                    color = TextDark.copy(alpha = 0.7f)
-                )
+                Text(text = "📍 ${event.location}", fontSize = 14.sp, color = TextDark.copy(alpha = 0.7f))
                 Spacer(modifier = Modifier.height(8.dp))
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "📅 ${event.date}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = PastelGreenDark
-                )
-                Text(
-                    text = "🕒 ${event.time}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = PastelGreenDark
-                )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
+                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
             }
         }
-    }
-}
-
-@Composable
-fun ProfilePlaceholder(
-    viewModel: AuthViewModel,
-    onLogoutSuccess: () -> Unit
-) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Профил — наскоро", color = TextDark.copy(alpha = 0.4f), fontSize = 16.sp)
     }
 }
 
@@ -433,41 +418,17 @@ fun ProfilePlaceholder(
 fun EventCard(event: Event) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = PastelGreenPrimary.copy(alpha = 0.12f)
-        ),
+        colors = CardDefaults.cardColors(containerColor = PastelGreenPrimary.copy(alpha = 0.12f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = event.title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextDark
-            )
+            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "📍 ${event.location}",
-                fontSize = 14.sp,
-                color = TextDark.copy(alpha = 0.7f)
-            )
+            Text(text = "📍 ${event.location}", fontSize = 14.sp, color = TextDark.copy(alpha = 0.7f))
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "📅 ${event.date}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = PastelGreenDark
-                )
-                Text(
-                    text = "🕒 ${event.time}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = PastelGreenDark
-                )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
+                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
             }
         }
     }
