@@ -3,6 +3,7 @@ package com.example.eventable.ui
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +35,7 @@ import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.analytics.FirebaseAnalytics
 
 fun Context.findActivity(): ComponentActivity? = when (this) {
     is ComponentActivity -> this
@@ -56,6 +58,9 @@ fun LoginScreen(
     val context = LocalContext.current
     val errorMessage by viewModel.errorMessage
     val isLoading by viewModel.isLoading
+
+    // Иницијализација на Firebase Analytics
+    val analytics = remember { FirebaseAnalytics.getInstance(context) }
 
     val webClientId = "463391834557-n1ph178cukbfpt1l49frrilgv148oomu.apps.googleusercontent.com"
     val gso = remember {
@@ -177,7 +182,12 @@ fun LoginScreen(
         } else {
             // Е-маил копче
             Button(
-                onClick = { viewModel.signInWithEmail(email, password, onLoginSuccess) },
+                onClick = {
+                    val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "email") }
+                    analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
+                    viewModel.signInWithEmail(email, password, onLoginSuccess)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -194,7 +204,10 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = onEmailLoginClick) {
+            TextButton(onClick = {
+                analytics.logEvent("click_navigate_to_register", null)
+                onEmailLoginClick()
+            }) {
                 Text(
                     text = "Немаш профил? Регистрирај се тука",
                     color = PastelGreenDark,
@@ -215,6 +228,9 @@ fun LoginScreen(
             // Google копче
             Button(
                 onClick = {
+                    val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "google") }
+                    analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
                     onGoogleLoginClick()
                     googleLauncher.launch(googleSignInClient.signInIntent)
                 },
@@ -244,6 +260,9 @@ fun LoginScreen(
             // Facebook копче
             Button(
                 onClick = {
+                    val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "facebook") }
+                    analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
                     onFacebookLoginClick()
                     facebookLauncher.launch(listOf("public_profile"))
                 },
@@ -271,7 +290,12 @@ fun LoginScreen(
 
             // Гостин копче
             Button(
-                onClick = { viewModel.signInAnonymously(onLoginSuccess) },
+                onClick = {
+                    val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "guest") }
+                    analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
+                    viewModel.signInAnonymously(onLoginSuccess)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),

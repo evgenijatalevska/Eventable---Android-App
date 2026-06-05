@@ -36,9 +36,33 @@ fun OfferDetailScreen(
     }
 
     var isEditMode by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     var title by remember(offer) { mutableStateOf(offer.title) }
     var content by remember(offer) { mutableStateOf(offer.content) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Избриши понуда") },
+            text = { Text("Дали сте сигурни дека сакате да ја избришете оваа понуда?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    }
+                ) {
+                    Text("Избриши", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Откажи", color = PastelGreenDark)
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -70,7 +94,7 @@ fun OfferDetailScreen(
                         IconButton(onClick = { isEditMode = true }) {
                             Icon(Icons.Default.Edit, contentDescription = "Уреди", tint = PastelGreenDark)
                         }
-                        IconButton(onClick = onDelete) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(Icons.Default.Delete, contentDescription = "Избриши", tint = Color.Red)
                         }
                     }

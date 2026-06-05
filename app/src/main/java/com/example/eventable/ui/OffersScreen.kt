@@ -1,5 +1,6 @@
 package com.example.eventable.ui
 
+import android.os.Bundle // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.example.eventable.R
 import com.example.eventable.data.Offer
 import com.example.eventable.ui.theme.*
+import com.google.firebase.analytics.FirebaseAnalytics // ДОДАДЕНО ЗА ANALYTICS
 
 @Composable
 fun OffersScreen(
@@ -35,6 +38,10 @@ fun OffersScreen(
     onOfferClick: (String) -> Unit,
     onAddOfferClick: () -> Unit
 ) {
+    // ДОДАДЕНО ЗА ANALYTICS
+    val context = LocalContext.current
+    val analytics = remember { FirebaseAnalytics.getInstance(context) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -92,7 +99,12 @@ fun OffersScreen(
                         ) {
                             OfferCardWhite(
                                 offer = offers.first(),
-                                onClick = { onOfferClick(offers.first().id) }
+                                onClick = {
+                                    // ДОДАДЕНО ЗА ANALYTICS
+                                    val bundle = Bundle().apply { putString("offer_id", offers.first().id) }
+                                    analytics.logEvent("view_offer_detail", bundle)
+                                    onOfferClick(offers.first().id)
+                                }
                             )
                         }
                     }
@@ -104,7 +116,12 @@ fun OffersScreen(
                 items(offers.drop(1)) { offer ->
                     OfferCardWhite(
                         offer = offer,
-                        onClick = { onOfferClick(offer.id) }
+                        onClick = {
+                            // ДОДАДЕНО ЗА ANALYTICS
+                            val bundle = Bundle().apply { putString("offer_id", offer.id) }
+                            analytics.logEvent("view_offer_detail", bundle)
+                            onOfferClick(offer.id)
+                        }
                     )
                 }
             } else if (isLoading) {
@@ -148,7 +165,11 @@ fun OffersScreen(
 
         // Десно долу копче за додавање понуда
         FloatingActionButton(
-            onClick = onAddOfferClick,
+            onClick = {
+                // ДОДАДЕНО ЗА ANALYTICS
+                analytics.logEvent("add_offer_fab_click", null)
+                onAddOfferClick()
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),

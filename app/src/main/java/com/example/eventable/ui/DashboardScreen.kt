@@ -332,7 +332,10 @@ fun DashboardScreen(
                             onOfferClick = { id -> selectedOfferId = id },
                             onAddOfferClick = { showAddOffer = true }
                         )
-                        AppScreen.CALENDAR -> CalendarScreen(eventViewModel = eventViewModel)
+                        AppScreen.CALENDAR -> CalendarScreen(
+                            eventViewModel = eventViewModel,
+                            onEventClick = { id -> selectedEventId = id }
+                        )
 
                         // --- 👤 НАВИГАЦИЈА НИЗ ПРОФИЛОТ (Поврзано со ProfileScreen.kt) ---
                         AppScreen.PROFILE -> when (currentProfileSubScreen) {

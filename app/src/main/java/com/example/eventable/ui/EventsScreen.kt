@@ -1,5 +1,6 @@
 package com.example.eventable.ui
 
+import android.os.Bundle // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventable.R
 import com.example.eventable.data.Event
 import com.example.eventable.ui.theme.*
+import com.google.firebase.analytics.FirebaseAnalytics // ДОДАДЕНО ЗА ANALYTICS
 
 @Composable
 fun EventsScreen(
@@ -40,6 +43,10 @@ fun EventsScreen(
 ) {
     val events by eventViewModel.events.collectAsStateWithLifecycle()
     val isLoading by eventViewModel.isLoading.collectAsStateWithLifecycle()
+
+    // ДОДАДЕНО ЗА ANALYTICS
+    val context = LocalContext.current
+    val analytics = remember { FirebaseAnalytics.getInstance(context) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -96,7 +103,11 @@ fun EventsScreen(
                                 .padding(horizontal = 16.dp)
                         ) {
                             Button(
-                                onClick = onCalendarClick,
+                                onClick = {
+                                    // ДОДАДЕНО ЗА ANALYTICS
+                                    analytics.logEvent("open_calendar_click", null)
+                                    onCalendarClick()
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.White.copy(alpha = 0.25f)
@@ -137,7 +148,12 @@ fun EventsScreen(
                         ) {
                             EventCardWhite(
                                 event = events.first(),
-                                onClick = { onEventClick(events.first().id) }
+                                onClick = {
+                                    // ДОДАДЕНО ЗА ANALYTICS
+                                    val bundle = Bundle().apply { putString("event_id", events.first().id) }
+                                    analytics.logEvent("view_event_detail", bundle)
+                                    onEventClick(events.first().id)
+                                }
                             )
                         }
                     }
@@ -149,7 +165,12 @@ fun EventsScreen(
                 items(events.drop(1)) { event ->
                     EventCardWhite(
                         event = event,
-                        onClick = { onEventClick(event.id) }
+                        onClick = {
+                            // ДОДАДЕНО ЗА ANALYTICS
+                            val bundle = Bundle().apply { putString("event_id", event.id) }
+                            analytics.logEvent("view_event_detail", bundle)
+                            onEventClick(event.id)
+                        }
                     )
                 }
             } else if (isLoading) {
@@ -193,7 +214,11 @@ fun EventsScreen(
 
         // Пловечко копче за додавање настан
         FloatingActionButton(
-            onClick = onAddEventClick,
+            onClick = {
+                // ДОДАДЕНО ЗА ANALYTICS
+                analytics.logEvent("add_event_fab_click", null)
+                onAddEventClick()
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),

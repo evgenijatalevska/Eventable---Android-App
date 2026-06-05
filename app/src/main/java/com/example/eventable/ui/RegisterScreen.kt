@@ -1,5 +1,6 @@
 package com.example.eventable.ui
 
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,12 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eventable.ui.theme.*
+import com.google.firebase.analytics.FirebaseAnalytics
 
 @Composable
 fun RegisterScreen(
@@ -31,9 +34,12 @@ fun RegisterScreen(
     var isLoginMode by remember { mutableStateOf(true) }
     var registrationSuccess by remember { mutableStateOf(false) }
 
-    // ПОПРАВЕНО: by наместо .value
+    val context = LocalContext.current
     val isLoading by viewModel.isLoading
     val error by viewModel.errorMessage
+
+    // Иницијализација на Firebase Analytics
+    val analytics = remember { FirebaseAnalytics.getInstance(context) }
 
     Column(
         modifier = Modifier
@@ -111,6 +117,7 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
+                    analytics.logEvent("click_go_to_login_after_success", null)
                     registrationSuccess = false
                     isLoginMode = true
                 },
@@ -190,8 +197,14 @@ fun RegisterScreen(
                 Button(
                     onClick = {
                         if (isLoginMode) {
+                            val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "email") }
+                            analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
                             viewModel.signInWithEmail(email, password, onAuthSuccess)
                         } else {
+                            val bundle = Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "email") }
+                            analytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle)
+
                             viewModel.signUpWithEmail(
                                 email, password,
                                 firstName, lastName, companyName,
@@ -217,7 +230,11 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextButton(onClick = { isLoginMode = !isLoginMode }) {
+                TextButton(onClick = {
+                    isLoginMode = !isLoginMode
+                    val bundle = Bundle().apply { putBoolean("is_login_mode", isLoginMode) }
+                    analytics.logEvent("toggle_auth_mode", bundle)
+                }) {
                     Text(
                         text = if (isLoginMode) "Немаш профил? Регистрирај се тука"
                         else "Веќе имаш профил? Најави се",
@@ -227,7 +244,10 @@ fun RegisterScreen(
                     )
                 }
 
-                TextButton(onClick = onBackClick) {
+                TextButton(onClick = {
+                    analytics.logEvent("click_back_to_welcome", null)
+                    onBackClick()
+                }) {
                     Text(
                         text = "Назад кон почетна",
                         color = TextDark.copy(alpha = 0.4f),
