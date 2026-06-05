@@ -25,6 +25,12 @@ class AuthViewModel : ViewModel() {
     var errorMessage = mutableStateOf<String?>(null)
         private set
 
+    // Динамични состојби за профилот на најавениот корисник
+    var firstNameState = mutableStateOf("")
+    var lastNameState = mutableStateOf("")
+    var companyNameState = mutableStateOf("")
+    var profileImageUriState = mutableStateOf<String?>(null)
+
     // Флаг за да не скокне на Dashboard при регистрација
     private var isRegistering = false
 
@@ -33,6 +39,60 @@ class AuthViewModel : ViewModel() {
             val user = firebaseAuth.currentUser
             if (user != null && !isRegistering) {
                 _isUserLoggedIn.value = true
+                loadUserProfile() // Вчитај ги податоците веднаш штом корисникот е потврден
+            }
+        }
+    }
+
+    // 📥 Вчитување на податоците од Firestore за најавениот корисник
+    fun loadUserProfile() {
+        val uid = auth.currentUser?.uid ?: return
+        viewModelScope.launch {
+            try {
+                val document = firestore.collection("users").document(uid).get().await()
+                if (document != null && document.exists()) {
+                    firstNameState.value = document.getString("firstName") ?: ""
+                    lastNameState.value = document.getString("lastName") ?: ""
+                    companyNameState.value = document.getString("companyName") ?: ""
+                    profileImageUriState.value = document.getString("profileImageUri")
+                }
+            } catch (e: Exception) {
+                // Тивко менаџирање грешка при преземање
+            }
+        }
+    }
+
+    // 💾 Ажурирање на податоците од профилот во Firestore
+    fun updateUserProfile(
+        firstName: String,
+        lastName: String,
+        companyName: String,
+        imageUri: String?,
+        onComplete: () -> Unit
+    ) {
+        val uid = auth.currentUser?.uid ?: return
+        viewModelScope.launch {
+            isLoading.value = true
+            try {
+                val updates = hashMapOf<String, Any?>(
+                    "firstName" to firstName,
+                    "lastName" to lastName,
+                    "companyName" to companyName,
+                    "profileImageUri" to imageUri
+                )
+                firestore.collection("users").document(uid).set(updates, com.google.firebase.firestore.SetOptions.merge()).await()
+
+                // Ажурирај ги локалните состојби
+                firstNameState.value = firstName
+                lastNameState.value = lastName
+                companyNameState.value = companyName
+                profileImageUriState.value = imageUri
+
+                onComplete()
+            } catch (e: Exception) {
+                errorMessage.value = "Грешка при зачувување: ${e.localizedMessage}"
+            } finally {
+                isLoading.value = false
             }
         }
     }
@@ -59,7 +119,7 @@ class AuthViewModel : ViewModel() {
                     e.message?.contains("password") == true -> "Погрешна лозинка. Обидете се повторно."
                     e.message?.contains("no user") == true -> "Не постои корисник со овој е-маил."
                     e.message?.contains("email") == true -> "Е-маил адресата е невалидна."
-                    e.message?.contains("network") == true -> "Проблем со интернет конекција."
+                    e.message?.contains("network") == true -> "Проблем со internet конекција."
                     else -> "Грешка при најава: ${e.localizedMessage}"
                 }
             } finally {

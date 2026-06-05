@@ -345,7 +345,12 @@ fun DashboardScreen(
                                     onLogoutSuccess = onLogoutSuccess
                                 )
                             }
-                            ProfileSubScreen.EDIT -> EditProfileScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
+                            ProfileSubScreen.EDIT -> {
+                                EditProfileScreen(
+                                    authViewModel = viewModel, // Го проследуваме viewModel за да има пристап до податоците
+                                    onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN }
+                                )
+                            }
                             ProfileSubScreen.LANGUAGE -> LanguageScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
                             ProfileSubScreen.NOTIFICATIONS -> NotificationsScreen(onBack = { currentProfileSubScreen = ProfileSubScreen.MAIN })
                         }
