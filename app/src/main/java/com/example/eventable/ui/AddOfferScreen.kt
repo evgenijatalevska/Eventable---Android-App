@@ -9,12 +9,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eventable.data.Offer
-import com.example.eventable.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,16 +26,16 @@ fun AddOfferScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Нова Понуда", fontWeight = FontWeight.Bold, color = PastelGreenDark) },
+                title = { Text("Нова Понуда", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = PastelGreenDark)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -54,11 +52,7 @@ fun AddOfferScreen(
                 label = { Text("Име на понуда (напр. Понуда 1)") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PastelGreenDark,
-                    focusedLabelColor = PastelGreenDark,
-                    cursorColor = PastelGreenDark
-                )
+                colors = dynamicTextFieldColors()
             )
 
             // Текст во стил на Notepad (Слободно внесување)
@@ -71,11 +65,7 @@ fun AddOfferScreen(
                     .heightIn(min = 300.dp),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = false,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PastelGreenDark,
-                    focusedLabelColor = PastelGreenDark,
-                    cursorColor = PastelGreenDark
-                )
+                colors = dynamicTextFieldColors()
             )
 
             Button(
@@ -88,10 +78,10 @@ fun AddOfferScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 enabled = title.isNotEmpty()
             ) {
-                Text("Зачувај Понуда", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Зачувај Понуда", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

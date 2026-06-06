@@ -76,7 +76,7 @@ fun AddEventScreen(
                     Text(
                         "Нов Настан",
                         fontWeight = FontWeight.Bold,
-                        color = PastelGreenDark
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
@@ -84,14 +84,14 @@ fun AddEventScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Назад",
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -103,12 +103,12 @@ fun AddEventScreen(
         ) {
             if (errorMsg != null) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)), // Semantic error — stays red in both themes
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = errorMsg!!,
-                        color = Color.Red,
+                        color = Color.Red, // Semantic error — stays red in both themes
                         fontSize = 13.sp,
                         modifier = Modifier.padding(12.dp)
                     )
@@ -134,11 +134,11 @@ fun AddEventScreen(
                         Icon(
                             Icons.Default.CalendarMonth,
                             contentDescription = "Избери датум",
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             OutlinedTextField(
@@ -154,11 +154,11 @@ fun AddEventScreen(
                         Icon(
                             Icons.Default.Schedule,
                             contentDescription = "Избери време",
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             ExposedDropdownMenuBox(
@@ -175,14 +175,14 @@ fun AddEventScreen(
                         .fillMaxWidth()
                         .menuAnchor(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors()
+                    colors = dynamicTextFieldColors()
                 )
                 ExposedDropdownMenu(
                     expanded = offerExpanded,
                     onDismissRequest = { offerExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Без понуда", color = Color.Gray) },
+                        text = { Text("Без понуда", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
                         onClick = {
                             selectedOffer = ""
                             offerExpanded = false
@@ -224,7 +224,7 @@ fun AddEventScreen(
                 shape = RoundedCornerShape(12.dp),
                 singleLine = false,
                 minLines = 3,
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             OutlinedTextField(
@@ -237,7 +237,7 @@ fun AddEventScreen(
                 shape = RoundedCornerShape(12.dp),
                 singleLine = false,
                 minLines = 3,
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -245,7 +245,7 @@ fun AddEventScreen(
             Button(
                 onClick = {
                     if (title.isEmpty()) {
-                        errorMsg = "Внесете име на настан."
+                        errorMsg = "Внесете ime на настан."
                         return@Button
                     }
                     if (date.isEmpty()) {
@@ -279,11 +279,11 @@ fun AddEventScreen(
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = "Зачувај Настан",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -312,6 +312,19 @@ fun EventTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         singleLine = singleLine,
         minLines = minLines,
-        colors = textFieldColors()
+        colors = dynamicTextFieldColors()
     )
 }
+
+@Composable
+fun dynamicTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+    focusedLabelColor = MaterialTheme.colorScheme.primary,
+    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+    cursorColor = MaterialTheme.colorScheme.primary,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    focusedContainerColor = Color.Transparent,
+    unfocusedContainerColor = Color.Transparent
+)

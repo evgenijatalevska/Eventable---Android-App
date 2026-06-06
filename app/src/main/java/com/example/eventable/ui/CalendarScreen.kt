@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventable.R
 import com.example.eventable.data.Event
-import com.example.eventable.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -85,7 +84,7 @@ fun CalendarScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundWhite)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
@@ -108,8 +107,8 @@ fun CalendarScreen(
                             .background(
                                 Brush.verticalGradient(
                                     colors = listOf(
-                                        PastelGreenDark.copy(alpha = 0.5f),
-                                        PastelGreenPrimary.copy(alpha = 0.35f)
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                                     )
                                 )
                             )
@@ -139,7 +138,7 @@ fun CalendarScreen(
                             bottomStart = 16.dp,
                             bottomEnd = 16.dp
                         ),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -158,7 +157,7 @@ fun CalendarScreen(
                                     Icon(
                                         Icons.Default.ArrowBackIosNew,
                                         contentDescription = null,
-                                        tint = PastelGreenDark,
+                                        tint = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
@@ -166,7 +165,7 @@ fun CalendarScreen(
                                     text = "${monthNames[currentMonth]} $currentYear",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = TextDark
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 IconButton(onClick = {
                                     if (currentMonth == 11) {
@@ -177,7 +176,7 @@ fun CalendarScreen(
                                     Icon(
                                         Icons.Default.ArrowForwardIos,
                                         contentDescription = null,
-                                        tint = PastelGreenDark,
+                                        tint = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
@@ -194,7 +193,7 @@ fun CalendarScreen(
                                         text = day,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = TextDark.copy(alpha = 0.4f),
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                                         modifier = Modifier.weight(1f),
                                         textAlign = TextAlign.Center
                                     )
@@ -229,8 +228,8 @@ fun CalendarScreen(
                                                     .clip(CircleShape)
                                                     .background(
                                                         when {
-                                                            isSelected -> PastelGreenPrimary
-                                                            isToday -> PastelGreenPrimary.copy(alpha = 0.2f)
+                                                            isSelected -> MaterialTheme.colorScheme.primary
+                                                            isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                                                             else -> Color.Transparent
                                                         }
                                                     )
@@ -243,9 +242,9 @@ fun CalendarScreen(
                                                         fontSize = 13.sp,
                                                         fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
                                                         color = when {
-                                                            isSelected -> Color.White
-                                                            isToday -> PastelGreenDark
-                                                            else -> TextDark
+                                                            isSelected -> MaterialTheme.colorScheme.onPrimary
+                                                            isToday -> MaterialTheme.colorScheme.secondary
+                                                            else -> MaterialTheme.colorScheme.onSurface
                                                         }
                                                     )
                                                     if (hasEvent) {
@@ -254,8 +253,8 @@ fun CalendarScreen(
                                                                 .size(4.dp)
                                                                 .clip(CircleShape)
                                                                 .background(
-                                                                    if (isSelected) Color.White
-                                                                    else PastelGreenDark
+                                                                    if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                                                    else MaterialTheme.colorScheme.secondary
                                                                 )
                                                         )
                                                     }
@@ -275,7 +274,7 @@ fun CalendarScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    HorizontalDivider(color = TextDark.copy(alpha = 0.08f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = if (eventsForSelectedDay.isEmpty())
@@ -285,8 +284,8 @@ fun CalendarScreen(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (eventsForSelectedDay.isEmpty())
-                            TextDark.copy(alpha = 0.4f)
-                        else TextDark,
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -311,8 +310,8 @@ fun CalendarScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = PastelGreenPrimary,
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(Icons.Default.Add, contentDescription = "Додај настан")
         }
@@ -332,7 +331,7 @@ fun CalendarEventCard(
             .fillMaxWidth()
             .shadow(4.dp, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onEventClick() }
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -340,20 +339,20 @@ fun CalendarEventCard(
                 text = event.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextDark
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = event.time,
                 fontSize = 13.sp,
-                color = PastelGreenDark,
+                color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Medium
             )
             if (event.offer.isNotEmpty()) {
                 Text(
                     text = event.offer,
                     fontSize = 12.sp,
-                    color = TextDark.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -363,14 +362,14 @@ fun CalendarEventCard(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = PastelGreenDark,
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Веќе додаден во Google Calendar",
                         fontSize = 12.sp,
-                        color = PastelGreenDark,
+                        color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -385,7 +384,7 @@ fun CalendarEventCard(
                     Text(
                         text = "Додај во Google Calendar",
                         fontSize = 12.sp,
-                        color = PastelGreenDark,
+                        color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Medium
                     )
                 }

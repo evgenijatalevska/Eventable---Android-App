@@ -18,13 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.eventable.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,16 +55,16 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Уреди Профил", fontWeight = FontWeight.Bold, color = PastelGreenDark) },
+                title = { Text("Уреди Профил", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = PastelGreenDark)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -97,8 +95,8 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(PastelGreenPrimary.copy(alpha = 0.15f))
-                        .border(2.dp, PastelGreenPrimary, CircleShape),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     if (selectedImageUri != null) {
@@ -113,7 +111,7 @@ fun EditProfileScreen(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Профилна слика",
                             modifier = Modifier.size(50.dp),
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -122,16 +120,16 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(PastelGreenPrimary)
+                        .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.BottomEnd)
-                        .border(2.dp, Color.White, CircleShape),
+                        .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = "Промени слика",
                         modifier = Modifier.size(16.dp),
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -150,10 +148,10 @@ fun EditProfileScreen(
                 shape = RoundedCornerShape(12.dp),
                 enabled = false,
                 colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = Color.Gray,
-                    disabledBorderColor = Color.LightGray.copy(alpha = 0.6f),
-                    disabledLabelColor = Color.Gray,
-                    disabledLeadingIconColor = Color.Gray
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             )
 
@@ -167,7 +165,7 @@ fun EditProfileScreen(
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PastelGreenPrimary, focusedLabelColor = PastelGreenDark)
+                colors = dynamicTextFieldColors()
             )
 
             OutlinedTextField(
@@ -177,7 +175,7 @@ fun EditProfileScreen(
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PastelGreenPrimary, focusedLabelColor = PastelGreenDark)
+                colors = dynamicTextFieldColors()
             )
 
             OutlinedTextField(
@@ -187,7 +185,7 @@ fun EditProfileScreen(
                 leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PastelGreenPrimary, focusedLabelColor = PastelGreenDark)
+                colors = dynamicTextFieldColors()
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -211,9 +209,9 @@ fun EditProfileScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Зачувај Промени", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Зачувај Промени", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

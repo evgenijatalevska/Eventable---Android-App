@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eventable.R
 import com.example.eventable.data.Offer
-import com.example.eventable.ui.theme.*
 import com.google.firebase.analytics.FirebaseAnalytics // ДОДАДЕНО ЗА ANALYTICS
 
 @Composable
@@ -70,8 +69,8 @@ fun OffersScreen(
                                 .background(
                                     Brush.verticalGradient(
                                         colors = listOf(
-                                            PastelGreenDark.copy(alpha = 0.6f),
-                                            PastelGreenPrimary.copy(alpha = 0.4f)
+                                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                                         )
                                     )
                                 )
@@ -132,7 +131,7 @@ fun OffersScreen(
                             .padding(top = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = PastelGreenDark)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             } else {
@@ -148,13 +147,13 @@ fun OffersScreen(
                         Text(
                             text = "Нема зачувани понуди",
                             fontSize = 16.sp,
-                            color = TextDark.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Притисни + за да креираш нова понуда",
                             fontSize = 13.sp,
-                            color = TextDark.copy(alpha = 0.3f)
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                         )
                     }
                 }
@@ -173,8 +172,8 @@ fun OffersScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = PastelGreenPrimary,
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(Icons.Default.Add, contentDescription = "Додај понуда")
         }
@@ -192,7 +191,7 @@ fun OfferCardWhite(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(6.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -200,7 +199,7 @@ fun OfferCardWhite(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = PastelGreenDark,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -208,7 +207,7 @@ fun OfferCardWhite(
                     text = offer.title,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextDark
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -217,7 +216,7 @@ fun OfferCardWhite(
                 Text(
                     text = offer.content,
                     fontSize = 14.sp,
-                    color = TextDark.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(start = 28.dp)

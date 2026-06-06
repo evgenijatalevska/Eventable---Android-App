@@ -17,7 +17,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.eventable.ui.theme.*
 import com.google.firebase.analytics.FirebaseAnalytics
 
 @Composable
@@ -44,7 +43,7 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundWhite)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,7 +55,7 @@ fun RegisterScreen(
             else "Креирај профил",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = PastelGreenDark,
+            color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center
         )
 
@@ -65,7 +64,7 @@ fun RegisterScreen(
             else if (isLoginMode) "Внесете ги вашите податоци за најава"
             else "Пополнете ги податоците за вашиот профил",
             fontSize = 14.sp,
-            color = TextDark.copy(alpha = 0.6f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier.padding(top = 8.dp, bottom = 32.dp),
             textAlign = TextAlign.Center
         )
@@ -85,7 +84,7 @@ fun RegisterScreen(
                     .padding(bottom = 24.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = PastelGreenPrimary.copy(alpha = 0.1f)
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 )
             ) {
                 Column(
@@ -102,14 +101,14 @@ fun RegisterScreen(
                         text = "Добредојдовте, $firstName!",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PastelGreenDark,
+                        color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Вашиот профил е успешно креиран. Најавете се со вашата е-маил адреса и лозинка.",
                         fontSize = 13.sp,
-                        color = TextDark.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -125,11 +124,11 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = "Оди на Најава",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -143,7 +142,7 @@ fun RegisterScreen(
                     label = { Text("Име *") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors()
+                    colors = dynamicTextFieldColors()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -153,7 +152,7 @@ fun RegisterScreen(
                     label = { Text("Презиме") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors()
+                    colors = dynamicTextFieldColors()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -163,7 +162,7 @@ fun RegisterScreen(
                     label = { Text("Име на игротека / компанија") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors()
+                    colors = dynamicTextFieldColors()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -174,7 +173,7 @@ fun RegisterScreen(
                 label = { Text("Е-маил адреса *") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -186,13 +185,13 @@ fun RegisterScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = textFieldColors()
+                colors = dynamicTextFieldColors()
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             if (isLoading) {
-                CircularProgressIndicator(color = PastelGreenDark)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
             } else {
                 Button(
                     onClick = {
@@ -218,11 +217,11 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .height(55.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = if (isLoginMode) "Најави се" else "Регистрирај се",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -238,7 +237,7 @@ fun RegisterScreen(
                     Text(
                         text = if (isLoginMode) "Немаш профил? Регистрирај се тука"
                         else "Веќе имаш профил? Најави се",
-                        color = PastelGreenDark,
+                        color = MaterialTheme.colorScheme.secondary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -250,7 +249,7 @@ fun RegisterScreen(
                 }) {
                     Text(
                         text = "Назад кон почетна",
-                        color = TextDark.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
                         fontSize = 14.sp
                     )
                 }
@@ -259,12 +258,3 @@ fun RegisterScreen(
     }
 }
 
-@Composable
-fun textFieldColors() = TextFieldDefaults.colors(
-    focusedContainerColor = Color.Transparent,
-    unfocusedContainerColor = Color.Transparent,
-    focusedIndicatorColor = PastelGreenPrimary,
-    unfocusedIndicatorColor = TextDark.copy(alpha = 0.2f),
-    focusedLabelColor = PastelGreenPrimary,
-    unfocusedLabelColor = TextDark.copy(alpha = 0.5f)
-)

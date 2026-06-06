@@ -28,14 +28,19 @@ class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
     private lateinit var callbackManager: CallbackManager
+    private lateinit var lightSensorManager: LightSensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         callbackManager = CallbackManager.Factory.create()
+        lightSensorManager = LightSensorManager(this)
 
         setContent {
-            EventableTheme {
+            val lux by lightSensorManager.lux.collectAsStateWithLifecycle()
+            val isDark = lux < LightSensorManager.DARK_MODE_THRESHOLD
+
+            EventableTheme(darkTheme = isDark) {
                 val isLoggedIn by authViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
                 var currentScreen by remember {
@@ -45,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                // 🔔 Автоматско барање дозвола за нотификации кај Android 13+
+                // Автоматско барање дозвола за нотификации кај Android 13+
                 val permissionLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission()
                 ) { isGranted ->
@@ -90,6 +95,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lightSensorManager.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lightSensorManager.stop()
     }
 
     @Deprecated("Deprecated in Java")

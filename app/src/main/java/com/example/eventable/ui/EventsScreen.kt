@@ -76,19 +76,19 @@ fun EventsScreen(
                                 .background(
                                     Brush.verticalGradient(
                                         colors = listOf(
-                                            PastelGreenDark.copy(alpha = 0.6f),
-                                            PastelGreenPrimary.copy(alpha = 0.4f)
+                                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                                         )
                                     )
                                 )
                         )
 
-                        // ПОПРАВКА: Спуштен наслов „Настани“ (променето од top = 20.dp во 40.dp)
+                        // ПОПРАВКА: Спуштен наслов „Настани" (променето од top = 20.dp во 40.dp)
                         Text(
                             text = "Настани",
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
+                            color = Color.White, // Always white — sits on top of the photo header
                             modifier = Modifier
                                 .align(Alignment.TopStart)
                                 .padding(start = 20.dp, top = 40.dp)
@@ -110,7 +110,7 @@ fun EventsScreen(
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.White.copy(alpha = 0.25f)
+                                    containerColor = Color.White.copy(alpha = 0.25f) // Semi-transparent on photo
                                 ),
                                 shape = RoundedCornerShape(12.dp),
                                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
@@ -123,7 +123,7 @@ fun EventsScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Отвори Календар",
-                                    color = Color.White,
+                                    color = Color.White, // Always white — sits on top of the photo header
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium,
                                     modifier = Modifier.weight(1f)
@@ -131,7 +131,7 @@ fun EventsScreen(
                                 Icon(
                                     imageVector = Icons.Default.ArrowForwardIos,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = Color.White, // Always white — sits on top of the photo header
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
@@ -181,7 +181,7 @@ fun EventsScreen(
                             .padding(top = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = PastelGreenDark)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             } else {
@@ -197,13 +197,13 @@ fun EventsScreen(
                         Text(
                             text = "Нема настани сè уште",
                             fontSize = 16.sp,
-                            color = TextDark.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Притисни + за да додадеш настан",
                             fontSize = 13.sp,
-                            color = TextDark.copy(alpha = 0.3f)
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                         )
                     }
                 }
@@ -222,8 +222,8 @@ fun EventsScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = PastelGreenPrimary,
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(Icons.Default.Add, contentDescription = "Додај настан")
         }
@@ -241,7 +241,7 @@ fun EventCardWhite(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(6.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -249,7 +249,7 @@ fun EventCardWhite(
                 text = event.title,
                 fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextDark
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -267,14 +267,14 @@ fun EventCardWhite(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = null,
-                        tint = PastelGreenDark,
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = event.date,
                         fontSize = 15.sp,
-                        color = TextDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -283,7 +283,7 @@ fun EventCardWhite(
                     modifier = Modifier
                         .width(1.dp)
                         .height(20.dp)
-                        .background(TextDark.copy(alpha = 0.15f))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
                 )
 
                 // Час
@@ -296,14 +296,14 @@ fun EventCardWhite(
                     Icon(
                         imageVector = Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = PastelGreenDark,
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = event.time,
                         fontSize = 15.sp,
-                        color = TextDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -314,7 +314,7 @@ fun EventCardWhite(
                 Text(
                     text = "Понуда: ${event.offer}",
                     fontSize = 13.sp,
-                    color = TextDark.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
         }

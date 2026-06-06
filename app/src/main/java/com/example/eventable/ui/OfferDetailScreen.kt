@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eventable.data.Offer
-import com.example.eventable.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +29,7 @@ fun OfferDetailScreen(
 ) {
     if (offer == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = PastelGreenDark)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
         }
         return
     }
@@ -58,7 +57,7 @@ fun OfferDetailScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Откажи", color = PastelGreenDark)
+                    Text("Откажи", color = MaterialTheme.colorScheme.secondary)
                 }
             }
         )
@@ -71,7 +70,7 @@ fun OfferDetailScreen(
                     Text(
                         text = if (isEditMode) "Уреди понуда" else offer.title,
                         fontWeight = FontWeight.Bold,
-                        color = PastelGreenDark
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
@@ -85,24 +84,24 @@ fun OfferDetailScreen(
                         Icon(
                             imageVector = if (isEditMode) Icons.Default.Close else Icons.Default.ArrowBack,
                             contentDescription = "Назад",
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
                 actions = {
                     if (!isEditMode) {
                         IconButton(onClick = { isEditMode = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Уреди", tint = PastelGreenDark)
+                            Icon(Icons.Default.Edit, contentDescription = "Уреди", tint = MaterialTheme.colorScheme.secondary)
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(Icons.Default.Delete, contentDescription = "Избриши", tint = Color.Red)
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -120,11 +119,7 @@ fun OfferDetailScreen(
                     label = { Text("Име на понуда") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PastelGreenDark,
-                        focusedLabelColor = PastelGreenDark,
-                        cursorColor = PastelGreenDark
-                    )
+                    colors = dynamicTextFieldColors()
                 )
 
                 OutlinedTextField(
@@ -136,11 +131,7 @@ fun OfferDetailScreen(
                         .heightIn(min = 300.dp),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = false,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PastelGreenDark,
-                        focusedLabelColor = PastelGreenDark,
-                        cursorColor = PastelGreenDark
-                    )
+                    colors = dynamicTextFieldColors()
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -153,7 +144,7 @@ fun OfferDetailScreen(
                         onClick = { isEditMode = false },
                         modifier = Modifier.weight(1f).height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PastelGreenDark)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
                     ) {
                         Text("Откажи")
                     }
@@ -166,10 +157,10 @@ fun OfferDetailScreen(
                         },
                         modifier = Modifier.weight(1f).height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         enabled = title.isNotEmpty()
                     ) {
-                        Text("Зачувај", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Зачувај", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -179,7 +170,7 @@ fun OfferDetailScreen(
                     Text("📝", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     // Поправено: Сега тука долу динамички се испишува вистинскиот наслов на понудата
-                    Text(text = "Детали: ", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                    Text(text = "Детали: ", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -187,7 +178,7 @@ fun OfferDetailScreen(
                 Text(
                     text = if (offer.content.isNotEmpty()) offer.content else "Нема внесено дополнителни податоци.",
                     fontSize = 16.sp,
-                    color = TextDark.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     lineHeight = 24.sp,
                     modifier = Modifier.padding(start = 4.dp)
                 )

@@ -56,7 +56,7 @@ fun EventDetailScreen(
 
     if (event == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = PastelGreenDark)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
         }
         return
     }
@@ -73,12 +73,12 @@ fun EventDetailScreen(
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Избриши", color = Color.Red)
+                    Text("Избриши", color = Color.Red) // Semantic destructive — stays red in both themes
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Откажи", color = PastelGreenDark)
+                    Text("Откажи", color = MaterialTheme.colorScheme.secondary)
                 }
             }
         )
@@ -91,7 +91,7 @@ fun EventDetailScreen(
                     Text(
                         text = if (isEditMode) "Уреди Настан" else event.title,
                         fontWeight = FontWeight.Bold,
-                        color = PastelGreenDark
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
@@ -99,7 +99,7 @@ fun EventDetailScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Назад",
-                            tint = PastelGreenDark
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
@@ -109,22 +109,22 @@ fun EventDetailScreen(
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Уреди",
-                                tint = PastelGreenDark
+                                tint = MaterialTheme.colorScheme.secondary
                             )
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = "Избриши",
-                                tint = Color.Red
+                                tint = Color.Red // Semantic destructive — stays red in both themes
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -157,17 +157,17 @@ fun EventDetailScreen(
                             .menuAnchor(),
                         shape = RoundedCornerShape(12.dp),
                         textStyle = androidx.compose.ui.text.TextStyle(
-                            color = if (offer.isEmpty()) TextDark.copy(alpha = 0.4f) else TextDark,
+                            color = if (offer.isEmpty()) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f) else MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
                         ),
-                        colors = textFieldColors()
+                        colors = dynamicTextFieldColors()
                     )
                     ExposedDropdownMenu(
                         expanded = offerExpanded,
                         onDismissRequest = { offerExpanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Без понуда", color = Color.Gray) },
+                            text = { Text("Без понуда", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
                             onClick = {
                                 offer = ""
                                 offerExpanded = false
@@ -202,7 +202,7 @@ fun EventDetailScreen(
                         onClick = { isEditMode = false },
                         modifier = Modifier.weight(1f).height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PastelGreenDark)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
                     ) {
                         Text("Откажи")
                     }
@@ -223,9 +223,9 @@ fun EventDetailScreen(
                         },
                         modifier = Modifier.weight(1f).height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Зачувај", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Зачувај", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -233,32 +233,32 @@ fun EventDetailScreen(
                 // --- VIEW MODE ---
 
                 DetailRowClean(
-                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
                     text = event.date
                 )
 
                 DetailRowClean(
-                    icon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                    icon = { Icon(Icons.Default.Schedule, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
                     text = event.time
                 )
 
                 if (event.offer.isNotEmpty()) {
                     DetailRowClean(
-                        icon = { Icon(Icons.Default.Star, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                        icon = { Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
                         text = "Понуда: ${event.offer}"
                     )
                 }
 
                 if (event.adultsCount > 0) {
                     DetailRowClean(
-                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp)) },
+                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
                         text = "Број на возрасни: ${event.adultsCount}"
                     )
                 }
 
                 if (event.childrenCount > 0) {
                     DetailRowClean(
-                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(16.dp)) },
+                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(16.dp)) },
                         text = "Број на деца: ${event.childrenCount}"
                     )
                 }
@@ -266,14 +266,14 @@ fun EventDetailScreen(
                 if (event.food.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.List, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.List, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Храна:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                            Text("Храна:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Text(
                             text = event.food,
                             fontSize = 15.sp,
-                            color = TextDark.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                         )
                     }
@@ -282,14 +282,14 @@ fun EventDetailScreen(
                 if (event.notes.isNotEmpty()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Edit, contentDescription = null, tint = PastelGreenDark, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Белешки:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                            Text("Белешки:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Text(
                             text = event.notes,
                             fontSize = 15.sp,
-                            color = TextDark.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             modifier = Modifier.padding(start = 28.dp, top = 4.dp)
                         )
                     }
@@ -314,7 +314,7 @@ fun DetailRowClean(
             text = text,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = TextDark
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

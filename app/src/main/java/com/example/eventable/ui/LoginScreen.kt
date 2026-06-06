@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eventable.R
-import com.example.eventable.ui.theme.*
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -109,7 +108,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundWhite)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -129,7 +128,7 @@ fun LoginScreen(
             text = "Eventable",
             fontSize = 36.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = PastelGreenDark,
+            color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center
         )
 
@@ -137,7 +136,7 @@ fun LoginScreen(
         Text(
             text = "Управувањето со родендени никогаш не било полесно!",
             fontSize = 14.sp,
-            color = TextDark.copy(alpha = 0.6f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 6.dp, bottom = 32.dp)
         )
@@ -149,7 +148,7 @@ fun LoginScreen(
             label = { Text("Е-маил адреса") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = textFieldColors()
+            colors = dynamicTextFieldColors()
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -162,7 +161,7 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = textFieldColors()
+            colors = dynamicTextFieldColors()
         )
 
         if (errorMessage != null) {
@@ -178,7 +177,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         if (isLoading) {
-            CircularProgressIndicator(color = PastelGreenDark)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
         } else {
             // Е-маил копче
             Button(
@@ -191,12 +190,12 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = "Најави се",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -210,7 +209,7 @@ fun LoginScreen(
             }) {
                 Text(
                     text = "Немаш профил? Регистрирај се тука",
-                    color = PastelGreenDark,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontSize = 14.sp
                 )
             }
@@ -220,7 +219,7 @@ fun LoginScreen(
             Text(
                 text = "или продолжи преку",
                 fontSize = 12.sp,
-                color = TextDark.copy(alpha = 0.5f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -249,7 +248,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = "Google",
-                    color = TextDark,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -300,13 +299,13 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = TextDark.copy(alpha = 0.08f)
+                    containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = "Гостин",
-                    color = TextDark.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )

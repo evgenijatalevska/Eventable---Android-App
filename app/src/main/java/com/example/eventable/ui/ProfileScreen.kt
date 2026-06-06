@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.eventable.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -61,9 +60,9 @@ fun ProfileScreen(
 
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
-            PastelGreenPrimary.copy(alpha = 0.35f),
-            BackgroundWhite,
-            BackgroundWhite
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+            MaterialTheme.colorScheme.background,
+            MaterialTheme.colorScheme.background
         )
     )
 
@@ -87,7 +86,7 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
@@ -100,8 +99,8 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(96.dp)
                             .clip(CircleShape)
-                            .background(PastelGreenPrimary.copy(alpha = 0.15f))
-                            .border(2.dp, PastelGreenPrimary, CircleShape),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         if (!profileImageUri.isNullOrEmpty()) {
@@ -116,7 +115,7 @@ fun ProfileScreen(
                                 imageVector = Icons.Default.Business,
                                 contentDescription = "Лого",
                                 modifier = Modifier.size(44.dp),
-                                tint = PastelGreenDark
+                                tint = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
@@ -127,7 +126,7 @@ fun ProfileScreen(
                         text = companyName.ifEmpty { "Име на игротека" },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(2.dp))
@@ -135,7 +134,7 @@ fun ProfileScreen(
                     Text(
                         text = userEmail,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
 
                     Spacer(modifier = Modifier.height(18.dp))
@@ -146,7 +145,7 @@ fun ProfileScreen(
                             .fillMaxWidth()
                             .height(46.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PastelGreenPrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -161,7 +160,7 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(modifier = Modifier.padding(vertical = 6.dp)) {
@@ -173,7 +172,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                     )
                     ProfileMenuRow(
                         icon = Icons.Default.Notifications,
@@ -190,14 +189,14 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(modifier = Modifier.padding(vertical = 6.dp)) {
                     ProfileMenuRow(
                         icon = Icons.Default.ExitToApp,
                         title = "Одјави се",
-                        iconTint = PastelGreenDark,
+                        iconTint = MaterialTheme.colorScheme.secondary,
                         onClick = {
                             authViewModel.signOut()
                             onLogoutSuccess()
@@ -205,7 +204,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                     )
                     ProfileMenuRow(
                         icon = Icons.Default.DeleteForever,
@@ -225,10 +224,13 @@ fun ProfileMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    titleColor: Color = TextDark,
-    iconTint: Color = PastelGreenDark,
+    titleColor: Color = Color.Unspecified,
+    iconTint: Color = Color.Unspecified,
     onClick: () -> Unit
 ) {
+    val resolvedIconTint = if (iconTint == Color.Unspecified) MaterialTheme.colorScheme.secondary else iconTint
+    val resolvedTitleColor = if (titleColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else titleColor
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -236,15 +238,15 @@ fun ProfileMenuRow(
             .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription = null, tint = resolvedIconTint, modifier = Modifier.size(22.dp))
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = titleColor)
+            Text(title, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = resolvedTitleColor)
             if (subtitle != null) {
-                Text(subtitle, fontSize = 12.sp, color = Color.Gray)
+                Text(subtitle, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
             }
         }
-        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color.LightGray)
+        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
     }
 }
 
@@ -254,12 +256,12 @@ fun LanguageScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Избери Јазик", fontWeight = FontWeight.Bold, color = PastelGreenDark) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад", tint = PastelGreenDark) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                title = { Text("Избери Јазик", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.secondary) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { p -> Box(Modifier.padding(p).fillMaxSize()) { Text("Опции за промена на јазик (MK / EN).", Modifier.padding(16.dp)) } }
 }
 
@@ -278,16 +280,16 @@ fun NotificationsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Нотификации", fontWeight = FontWeight.Bold, color = PastelGreenDark) },
+                title = { Text("Нотификации", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Назад", tint = PastelGreenDark)
+                        Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = BackgroundWhite
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -299,14 +301,14 @@ fun NotificationsScreen(onBack: () -> Unit) {
             Text(
                 text = "Подеси ги твоите известувања",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 fontWeight = FontWeight.Medium
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
@@ -321,13 +323,13 @@ fun NotificationsScreen(onBack: () -> Unit) {
                             text = "Пуш Нотификации",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = TextDark
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "Примај потсетници за претстојните настани на денот на настанот.",
                             fontSize = 12.sp,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             lineHeight = 16.sp
                         )
                     }
@@ -343,10 +345,10 @@ fun NotificationsScreen(onBack: () -> Unit) {
                             sharedPreferences.edit().putBoolean("notifications_enabled", value).apply()
                         },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = PastelGreenPrimary,
-                            uncheckedThumbColor = Color.Gray,
-                            uncheckedTrackColor = Color.LightGray.copy(alpha = 0.5f)
+                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                         )
                     )
                 }

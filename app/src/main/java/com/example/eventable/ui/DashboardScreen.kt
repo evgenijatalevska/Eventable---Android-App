@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eventable.data.Event
-import com.example.eventable.ui.theme.*
 import kotlinx.coroutines.launch
 
 enum class AppScreen {
@@ -71,29 +70,29 @@ fun DashboardScreen(
         drawerContent = {
             ModalDrawerSheet(
                 windowInsets = WindowInsets(0),
-                drawerContainerColor = BackgroundWhite
+                drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
                 Text(
                     text = "Eventable",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = PastelGreenDark,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                 )
                 Text(
                     text = "Главно мени",
                     fontSize = 12.sp,
-                    color = TextDark.copy(alpha = 0.4f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(color = TextDark.copy(alpha = 0.1f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = null, tint = PastelGreenDark) },
-                    label = { Text("Настани", fontWeight = FontWeight.Medium, color = TextDark) },
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+                    label = { Text("Настани", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface) },
                     selected = currentAppScreen == AppScreen.EVENTS,
                     onClick = {
                         currentAppScreen = AppScreen.EVENTS
@@ -105,15 +104,15 @@ fun DashboardScreen(
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = PastelGreenPrimary.copy(alpha = 0.15f),
+                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         unselectedContainerColor = Color.Transparent
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Star, contentDescription = null, tint = PastelGreenDark) },
-                    label = { Text("Понуди", fontWeight = FontWeight.Medium, color = TextDark) },
+                    icon = { Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+                    label = { Text("Понуди", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface) },
                     selected = currentAppScreen == AppScreen.OFFERS,
                     onClick = {
                         currentAppScreen = AppScreen.OFFERS
@@ -125,15 +124,15 @@ fun DashboardScreen(
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = PastelGreenPrimary.copy(alpha = 0.15f),
+                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         unselectedContainerColor = Color.Transparent
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PastelGreenDark) },
-                    label = { Text("Календар", fontWeight = FontWeight.Medium, color = TextDark) },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+                    label = { Text("Календар", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface) },
                     selected = currentAppScreen == AppScreen.CALENDAR,
                     onClick = {
                         currentAppScreen = AppScreen.CALENDAR
@@ -145,13 +144,13 @@ fun DashboardScreen(
                         scope.launch { drawerState.close() }
                     },
                     colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = PastelGreenPrimary.copy(alpha = 0.15f),
+                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         unselectedContainerColor = Color.Transparent
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                HorizontalDivider(color = TextDark.copy(alpha = 0.1f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.ExitToApp, contentDescription = null, tint = Color.Red) },
                     label = { Text("Одјави се", fontWeight = FontWeight.Medium, color = Color.Red) },
@@ -185,16 +184,16 @@ fun DashboardScreen(
                                     else -> ""
                                 },
                                 fontWeight = FontWeight.ExtraBold,
-                                color = PastelGreenDark
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         },
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundWhite)
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                     )
                 }
             },
             bottomBar = {
                 NavigationBar(
-                    containerColor = BackgroundWhite,
+                    containerColor = MaterialTheme.colorScheme.background,
                     tonalElevation = 8.dp
                 ) {
                     NavigationBarItem(
@@ -202,7 +201,7 @@ fun DashboardScreen(
                             Icon(
                                 Icons.Default.Menu,
                                 contentDescription = "Мени",
-                                tint = if (drawerState.isOpen) PastelGreenDark else TextDark.copy(alpha = 0.5f)
+                                tint = if (drawerState.isOpen) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Мени", fontSize = 11.sp) },
@@ -214,9 +213,9 @@ fun DashboardScreen(
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PastelGreenDark,
-                            selectedTextColor = PastelGreenDark,
-                            indicatorColor = PastelGreenPrimary.copy(alpha = 0.15f)
+                            selectedIconColor = MaterialTheme.colorScheme.secondary,
+                            selectedTextColor = MaterialTheme.colorScheme.secondary,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                         )
                     )
                     NavigationBarItem(
@@ -225,7 +224,7 @@ fun DashboardScreen(
                                 Icons.Default.Home,
                                 contentDescription = "Home",
                                 tint = if (currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null)
-                                    PastelGreenDark else TextDark.copy(alpha = 0.5f)
+                                    MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Home", fontSize = 11.sp) },
@@ -239,9 +238,9 @@ fun DashboardScreen(
                             showAddOffer = false
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PastelGreenDark,
-                            selectedTextColor = PastelGreenDark,
-                            indicatorColor = PastelGreenPrimary.copy(alpha = 0.15f)
+                            selectedIconColor = MaterialTheme.colorScheme.secondary,
+                            selectedTextColor = MaterialTheme.colorScheme.secondary,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                         )
                     )
                     NavigationBarItem(
@@ -249,8 +248,8 @@ fun DashboardScreen(
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = "Профил",
-                                tint = if (currentAppScreen == AppScreen.PROFILE) PastelGreenDark
-                                else TextDark.copy(alpha = 0.5f)
+                                tint = if (currentAppScreen == AppScreen.PROFILE) MaterialTheme.colorScheme.secondary
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
                         },
                         label = { Text("Профил", fontSize = 11.sp) },
@@ -264,14 +263,14 @@ fun DashboardScreen(
                             showAddOffer = false
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PastelGreenDark,
-                            selectedTextColor = PastelGreenDark,
-                            indicatorColor = PastelGreenPrimary.copy(alpha = 0.15f)
+                            selectedIconColor = MaterialTheme.colorScheme.secondary,
+                            selectedTextColor = MaterialTheme.colorScheme.secondary,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                         )
                     )
                 }
             },
-            containerColor = BackgroundWhite
+            containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
             Box(
                 modifier = Modifier
@@ -376,19 +375,19 @@ fun HomeContent(eventViewModel: EventViewModel = viewModel()) {
     ) {
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = "Здраво! 👋", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Text(text = "Здраво! 👋", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
             Text(
                 text = "Еве ги твоите претстојни настани.",
                 fontSize = 14.sp,
-                color = TextDark.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
             )
-            Text(text = "Претстојни Настани", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = TextDark, modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Претстојни Настани", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(bottom = 4.dp))
         }
         if (events.isEmpty()) {
             item {
                 Box(modifier = Modifier.fillMaxWidth().padding(top = 32.dp), contentAlignment = Alignment.Center) {
-                    Text(text = "Нема настани сè уште", color = TextDark.copy(alpha = 0.4f), fontSize = 15.sp)
+                    Text(text = "Нема настани сè уште", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f), fontSize = 15.sp)
                 }
             }
         } else {
@@ -404,19 +403,19 @@ fun HomeContent(eventViewModel: EventViewModel = viewModel()) {
 fun HomeEventCard(event: Event) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = PastelGreenPrimary.copy(alpha = 0.12f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
             if (event.location.isNotEmpty()) {
-                Text(text = "📍 ${event.location}", fontSize = 14.sp, color = TextDark.copy(alpha = 0.7f))
+                Text(text = "📍 ${event.location}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 Spacer(modifier = Modifier.height(8.dp))
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
-                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
+                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
+                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
             }
         }
     }
@@ -426,17 +425,17 @@ fun HomeEventCard(event: Event) {
 fun EventCard(event: Event) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = PastelGreenPrimary.copy(alpha = 0.12f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Text(text = event.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "📍 ${event.location}", fontSize = 14.sp, color = TextDark.copy(alpha = 0.7f))
+            Text(text = "📍 ${event.location}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
-                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = PastelGreenDark)
+                Text(text = "📅 ${event.date}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
+                Text(text = "🕒 ${event.time}", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.secondary)
             }
         }
     }
