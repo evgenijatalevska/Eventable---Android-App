@@ -12,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.eventable.R
 import com.google.firebase.analytics.FirebaseAnalytics
 
 @Composable
@@ -50,9 +52,9 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = if (registrationSuccess) "Регистрацијата е успешна!"
-            else if (isLoginMode) "Добредојдовте назад"
-            else "Креирај профил",
+            text = if (registrationSuccess) stringResource(id = R.string.registration_success_title)
+            else if (isLoginMode) stringResource(id = R.string.welcome_back)
+            else stringResource(id = R.string.create_profile),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary,
@@ -60,9 +62,9 @@ fun RegisterScreen(
         )
 
         Text(
-            text = if (registrationSuccess) "Вашиот профил е креиран."
-            else if (isLoginMode) "Внесете ги вашите податоци за најава"
-            else "Пополнете ги податоците за вашиот профил",
+            text = if (registrationSuccess) stringResource(id = R.string.profile_created)
+            else if (isLoginMode) stringResource(id = R.string.enter_credentials)
+            else stringResource(id = R.string.fill_profile_details),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier.padding(top = 8.dp, bottom = 32.dp),
@@ -98,7 +100,7 @@ fun RegisterScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Добредојдовте, $firstName!",
+                        text = stringResource(id = R.string.welcome_name, firstName),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary,
@@ -106,7 +108,7 @@ fun RegisterScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Вашиот профил е успешно креиран. Најавете се со вашата е-маил адреса и лозинка.",
+                        text = stringResource(id = R.string.profile_created_login_prompt),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center
@@ -127,7 +129,7 @@ fun RegisterScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
-                    text = "Оди на Најава",
+                    text = stringResource(id = R.string.go_to_login),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -139,7 +141,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("Име *") },
+                    label = { Text(stringResource(id = R.string.first_name_required)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = dynamicTextFieldColors()
@@ -149,7 +151,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Презиме") },
+                    label = { Text(stringResource(id = R.string.last_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = dynamicTextFieldColors()
@@ -159,7 +161,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = companyName,
                     onValueChange = { companyName = it },
-                    label = { Text("Име на игротека / компанија") },
+                    label = { Text(stringResource(id = R.string.company_name_optional_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = dynamicTextFieldColors()
@@ -170,7 +172,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Е-маил адреса *") },
+                label = { Text(stringResource(id = R.string.email_address_required)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = dynamicTextFieldColors()
@@ -181,7 +183,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Лозинка *") },
+                label = { Text(stringResource(id = R.string.password_required)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -220,7 +222,7 @@ fun RegisterScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
-                        text = if (isLoginMode) "Најави се" else "Регистрирај се",
+                        text = if (isLoginMode) stringResource(id = R.string.login) else stringResource(id = R.string.register),
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
@@ -235,8 +237,8 @@ fun RegisterScreen(
                     analytics.logEvent("toggle_auth_mode", bundle)
                 }) {
                     Text(
-                        text = if (isLoginMode) "Немаш профил? Регистрирај се тука"
-                        else "Веќе имаш профил? Најави се",
+                        text = if (isLoginMode) stringResource(id = R.string.no_account)
+                        else stringResource(id = R.string.have_account),
                         color = MaterialTheme.colorScheme.secondary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -248,7 +250,7 @@ fun RegisterScreen(
                     onBackClick()
                 }) {
                     Text(
-                        text = "Назад кон почетна",
+                        text = stringResource(id = R.string.back_to_home),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
                         fontSize = 14.sp
                     )

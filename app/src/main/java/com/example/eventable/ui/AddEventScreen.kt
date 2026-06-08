@@ -16,12 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.eventable.R
 import com.example.eventable.data.Event
 import com.example.eventable.ui.theme.*
 import java.util.Calendar
@@ -35,6 +37,10 @@ fun AddEventScreen(
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
+    val errorEnterEventName = stringResource(id = R.string.error_enter_event_name)
+    val errorSelectDate = stringResource(id = R.string.error_select_date)
+    val errorSelectTime = stringResource(id = R.string.error_select_time)
 
     val offers by offerViewModel.offers.collectAsStateWithLifecycle()
 
@@ -74,7 +80,7 @@ fun AddEventScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Нов Настан",
+                        stringResource(id = R.string.new_event),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -83,7 +89,7 @@ fun AddEventScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -118,14 +124,14 @@ fun AddEventScreen(
             EventTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = "Име на настан *"
+                label = stringResource(id = R.string.event_name)
             )
 
             OutlinedTextField(
                 value = date,
                 onValueChange = { },
-                label = { Text("Датум *") },
-                placeholder = { Text("дд.мм.гггг") },
+                label = { Text(stringResource(id = R.string.date_required)) },
+                placeholder = { Text(stringResource(id = R.string.date_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 readOnly = true,
@@ -133,7 +139,7 @@ fun AddEventScreen(
                     IconButton(onClick = { datePickerDialog.show() }) {
                         Icon(
                             Icons.Default.CalendarMonth,
-                            contentDescription = "Избери датум",
+                            contentDescription = stringResource(id = R.string.choose_date),
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -144,8 +150,8 @@ fun AddEventScreen(
             OutlinedTextField(
                 value = time,
                 onValueChange = { },
-                label = { Text("Време *") },
-                placeholder = { Text("чч:мм") },
+                label = { Text(stringResource(id = R.string.time_required)) },
+                placeholder = { Text(stringResource(id = R.string.time_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 readOnly = true,
@@ -153,7 +159,7 @@ fun AddEventScreen(
                     IconButton(onClick = { timePickerDialog.show() }) {
                         Icon(
                             Icons.Default.Schedule,
-                            contentDescription = "Избери време",
+                            contentDescription = stringResource(id = R.string.choose_time),
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -166,10 +172,10 @@ fun AddEventScreen(
                 onExpandedChange = { offerExpanded = !offerExpanded }
             ) {
                 OutlinedTextField(
-                    value = selectedOffer.ifEmpty { "Понуда" },
+                    value = selectedOffer.ifEmpty { stringResource(id = R.string.offer_label) },
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Понуда") },
+                    label = { Text(stringResource(id = R.string.offer_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = offerExpanded) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -182,7 +188,7 @@ fun AddEventScreen(
                     onDismissRequest = { offerExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Без понуда", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
+                        text = { Text(stringResource(id = R.string.without_offer), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
                         onClick = {
                             selectedOffer = ""
                             offerExpanded = false
@@ -203,21 +209,21 @@ fun AddEventScreen(
             EventTextField(
                 value = adultsCount,
                 onValueChange = { adultsCount = it },
-                label = "Број на возрасни",
+                label = stringResource(id = R.string.adults_count),
                 keyboardType = KeyboardType.Number
             )
 
             EventTextField(
                 value = childrenCount,
                 onValueChange = { childrenCount = it },
-                label = "Број на деца",
+                label = stringResource(id = R.string.children_count),
                 keyboardType = KeyboardType.Number
             )
 
             OutlinedTextField(
                 value = food,
                 onValueChange = { food = it },
-                label = { Text("Храна") },
+                label = { Text(stringResource(id = R.string.food)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
@@ -230,7 +236,7 @@ fun AddEventScreen(
             OutlinedTextField(
                 value = additionalInfo,
                 onValueChange = { additionalInfo = it },
-                label = { Text("Дополнителни податоци") },
+                label = { Text(stringResource(id = R.string.additional_info)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
@@ -245,15 +251,15 @@ fun AddEventScreen(
             Button(
                 onClick = {
                     if (title.isEmpty()) {
-                        errorMsg = "Внесете ime на настан."
+                        errorMsg = errorEnterEventName
                         return@Button
                     }
                     if (date.isEmpty()) {
-                        errorMsg = "Изберете датум."
+                        errorMsg = errorSelectDate
                         return@Button
                     }
                     if (time.isEmpty()) {
-                        errorMsg = "Изберете време."
+                        errorMsg = errorSelectTime
                         return@Button
                     }
 
@@ -282,7 +288,7 @@ fun AddEventScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
-                    text = "Зачувај Настан",
+                    text = stringResource(id = R.string.save_event),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold

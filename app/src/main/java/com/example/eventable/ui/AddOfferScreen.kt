@@ -9,9 +9,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.eventable.R
 import com.example.eventable.data.Offer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,10 +28,10 @@ fun AddOfferScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Нова Понуда", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
+                title = { Text(stringResource(id = R.string.new_offer), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = MaterialTheme.colorScheme.secondary)
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back), tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -49,7 +51,7 @@ fun AddOfferScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Име на понуда (напр. Понуда 1)") },
+                label = { Text(stringResource(id = R.string.offer_name_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = dynamicTextFieldColors()
@@ -59,7 +61,7 @@ fun AddOfferScreen(
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
-                label = { Text("Внесете ги деталите за понудата тука...") },
+                label = { Text(stringResource(id = R.string.offer_details_hint)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 300.dp),
@@ -81,7 +83,7 @@ fun AddOfferScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 enabled = title.isNotEmpty()
             ) {
-                Text("Зачувај Понуда", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(id = R.string.save_offer), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

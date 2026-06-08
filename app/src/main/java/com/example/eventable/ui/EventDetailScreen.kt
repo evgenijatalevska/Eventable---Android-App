@@ -18,12 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.eventable.R
 import com.example.eventable.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +66,8 @@ fun EventDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Избриши настан") },
-            text = { Text("Дали сте сигурни дека сакате да го избришете овој настан?") },
+            title = { Text(stringResource(id = R.string.delete_event)) },
+            text = { Text(stringResource(id = R.string.delete_event_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -73,12 +75,12 @@ fun EventDetailScreen(
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Избриши", color = Color.Red) // Semantic destructive — stays red in both themes
+                    Text(stringResource(id = R.string.delete), color = Color.Red) // Semantic destructive — stays red in both themes
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Откажи", color = MaterialTheme.colorScheme.secondary)
+                    Text(stringResource(id = R.string.cancel), color = MaterialTheme.colorScheme.secondary)
                 }
             }
         )
@@ -89,7 +91,7 @@ fun EventDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEditMode) "Уреди Настан" else event.title,
+                        text = if (isEditMode) stringResource(id = R.string.edit_event) else event.title,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -98,7 +100,7 @@ fun EventDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -108,14 +110,14 @@ fun EventDetailScreen(
                         IconButton(onClick = { isEditMode = true }) {
                             Icon(
                                 Icons.Default.Edit,
-                                contentDescription = "Уреди",
+                                contentDescription = stringResource(id = R.string.edit),
                                 tint = MaterialTheme.colorScheme.secondary
                             )
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Избриши",
+                                contentDescription = stringResource(id = R.string.delete),
                                 tint = Color.Red // Semantic destructive — stays red in both themes
                             )
                         }
@@ -136,10 +138,10 @@ fun EventDetailScreen(
         ) {
             if (isEditMode) {
                 // --- EDIT MODE ---
-                EventTextField(value = title, onValueChange = { title = it }, label = "Име на настан *")
-                EventTextField(value = location, onValueChange = { location = it }, label = "Локација")
-                EventTextField(value = date, onValueChange = { date = it }, label = "Датум")
-                EventTextField(value = time, onValueChange = { time = it }, label = "Време")
+                EventTextField(value = title, onValueChange = { title = it }, label = stringResource(id = R.string.event_name))
+                EventTextField(value = location, onValueChange = { location = it }, label = stringResource(id = R.string.location))
+                EventTextField(value = date, onValueChange = { date = it }, label = stringResource(id = R.string.date))
+                EventTextField(value = time, onValueChange = { time = it }, label = stringResource(id = R.string.time))
 
                 // --- ИЗБОР НА ПОНУДА ПРЕКУ DROP DOWN ВО EDIT РЕЖИМ ---
                 ExposedDropdownMenuBox(
@@ -147,10 +149,10 @@ fun EventDetailScreen(
                     onExpandedChange = { offerExpanded = !offerExpanded }
                 ) {
                     OutlinedTextField(
-                        value = offer.ifEmpty { "Понуда" },
+                        value = offer.ifEmpty { stringResource(id = R.string.offer_label) },
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Понуда") },
+                        label = { Text(stringResource(id = R.string.offer_label)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = offerExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -167,7 +169,7 @@ fun EventDetailScreen(
                         onDismissRequest = { offerExpanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Без понуда", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
+                            text = { Text(stringResource(id = R.string.without_offer), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
                             onClick = {
                                 offer = ""
                                 offerExpanded = false
@@ -185,12 +187,12 @@ fun EventDetailScreen(
                     }
                 }
 
-                EventTextField(value = adultsCount, onValueChange = { adultsCount = it }, label = "Број на возрасни", keyboardType = KeyboardType.Number)
-                EventTextField(value = childrenCount, onValueChange = { childrenCount = it }, label = "Број на деца", keyboardType = KeyboardType.Number)
+                EventTextField(value = adultsCount, onValueChange = { adultsCount = it }, label = stringResource(id = R.string.adults_count), keyboardType = KeyboardType.Number)
+                EventTextField(value = childrenCount, onValueChange = { childrenCount = it }, label = stringResource(id = R.string.children_count), keyboardType = KeyboardType.Number)
 
                 // Измена: Храната сега поддржува повеќе линии исто како белешките
-                EventTextField(value = food, onValueChange = { food = it }, label = "Храна", singleLine = false, minLines = 3)
-                EventTextField(value = notes, onValueChange = { notes = it }, label = "Белешки", singleLine = false, minLines = 3)
+                EventTextField(value = food, onValueChange = { food = it }, label = stringResource(id = R.string.food), singleLine = false, minLines = 3)
+                EventTextField(value = notes, onValueChange = { notes = it }, label = stringResource(id = R.string.notes), singleLine = false, minLines = 3)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -204,7 +206,7 @@ fun EventDetailScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
                     ) {
-                        Text("Откажи")
+                        Text(stringResource(id = R.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -225,7 +227,7 @@ fun EventDetailScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Зачувај", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.save), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -245,21 +247,21 @@ fun EventDetailScreen(
                 if (event.offer.isNotEmpty()) {
                     DetailRowClean(
                         icon = { Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
-                        text = "Понуда: ${event.offer}"
+                        text = stringResource(id = R.string.offer_prefixed, event.offer)
                     )
                 }
 
                 if (event.adultsCount > 0) {
                     DetailRowClean(
                         icon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp)) },
-                        text = "Број на возрасни: ${event.adultsCount}"
+                        text = stringResource(id = R.string.adults_count_prefixed, event.adultsCount)
                     )
                 }
 
                 if (event.childrenCount > 0) {
                     DetailRowClean(
                         icon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(16.dp)) },
-                        text = "Број на деца: ${event.childrenCount}"
+                        text = stringResource(id = R.string.children_count_prefixed, event.childrenCount)
                     )
                 }
 
@@ -268,7 +270,7 @@ fun EventDetailScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.List, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Храна:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(id = R.string.food_colon), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Text(
                             text = event.food,
@@ -284,7 +286,7 @@ fun EventDetailScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Белешки:", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(id = R.string.notes_colon), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Text(
                             text = event.notes,

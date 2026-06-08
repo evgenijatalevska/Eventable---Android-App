@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,7 +86,7 @@ fun EventsScreen(
 
                         // ПОПРАВКА: Спуштен наслов „Настани" (променето од top = 20.dp во 40.dp)
                         Text(
-                            text = "Настани",
+                            text = stringResource(id = R.string.events),
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White, // Always white — sits on top of the photo header
@@ -122,7 +123,7 @@ fun EventsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Отвори Календар",
+                                    text = stringResource(id = R.string.open_calendar),
                                     color = Color.White, // Always white — sits on top of the photo header
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium,
@@ -195,13 +196,13 @@ fun EventsScreen(
                         Text(text = "🎉", fontSize = 48.sp)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Нема настани сè уште",
+                            text = stringResource(id = R.string.no_events_yet),
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Притисни + за да додадеш настан",
+                            text = stringResource(id = R.string.press_plus_add_event),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                         )
@@ -225,7 +226,7 @@ fun EventsScreen(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Додај настан")
+            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add_event))
         }
     }
 }
@@ -312,7 +313,7 @@ fun EventCardWhite(
             if (event.offer.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "Понуда: ${event.offer}",
+                    text = stringResource(id = R.string.offer_prefixed, event.offer),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )

@@ -2,6 +2,8 @@ package com.example.eventable.ui
 
 import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,10 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.eventable.R
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -38,7 +42,8 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
-    val userEmail = currentUser?.email ?: "Нема е-маил"
+    val noEmailText = stringResource(id = R.string.no_email)
+    val userEmail = currentUser?.email ?: noEmailText
 
     // Динамичко земање на вредностите директно од ViewModel
     val companyName by remember { authViewModel.companyNameState }
@@ -58,6 +63,8 @@ fun ProfileScreen(
             .getBoolean("notifications_enabled", true)
     }
 
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
+
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
@@ -65,6 +72,32 @@ fun ProfileScreen(
             MaterialTheme.colorScheme.background
         )
     )
+
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAccountDialog = false },
+            title = { Text(stringResource(id = R.string.delete_account)) },
+            text = { Text(stringResource(id = R.string.delete_account_confirm)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteAccountDialog = false
+                        authViewModel.deleteAccount(
+                            onSuccess = { onLogoutSuccess() },
+                            onError = { /* isLoading resets in finally; surface error if needed */ }
+                        )
+                    }
+                ) {
+                    Text(stringResource(id = R.string.delete), color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAccountDialog = false }) {
+                    Text(stringResource(id = R.string.cancel), color = MaterialTheme.colorScheme.secondary)
+                }
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -106,14 +139,14 @@ fun ProfileScreen(
                         if (!profileImageUri.isNullOrEmpty()) {
                             AsyncImage(
                                 model = Uri.parse(profileImageUri),
-                                contentDescription = "Профилна слика",
+                                contentDescription = stringResource(id = R.string.profile_picture),
                                 modifier = Modifier.fillMaxSize().clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Default.Business,
-                                contentDescription = "Лого",
+                                contentDescription = stringResource(id = R.string.logo),
                                 modifier = Modifier.size(44.dp),
                                 tint = MaterialTheme.colorScheme.secondary
                             )
@@ -123,7 +156,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = companyName.ifEmpty { "Име на игротека" },
+                        text = companyName.ifEmpty { stringResource(id = R.string.company_name_label) },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -149,7 +182,7 @@ fun ProfileScreen(
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Уреди Профил", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(id = R.string.edit_profile), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -166,8 +199,8 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(vertical = 6.dp)) {
                     ProfileMenuRow(
                         icon = Icons.Default.Language,
-                        title = "Јазик",
-                        subtitle = "Македонски",
+                        title = stringResource(id = R.string.language),
+                        subtitle = stringResource(id = R.string.macedonian),
                         onClick = onLanguageClick
                     )
                     HorizontalDivider(
@@ -176,8 +209,8 @@ fun ProfileScreen(
                     )
                     ProfileMenuRow(
                         icon = Icons.Default.Notifications,
-                        title = "Нотификации",
-                        subtitle = if (isNotificationsEnabled) "Вклучени" else "Исклучени", // Динамички поднасловови
+                        title = stringResource(id = R.string.notifications),
+                        subtitle = if (isNotificationsEnabled) stringResource(id = R.string.enabled) else stringResource(id = R.string.disabled), // Динамички поднасловови
                         onClick = onNotificationsClick
                     )
                 }
@@ -195,7 +228,7 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(vertical = 6.dp)) {
                     ProfileMenuRow(
                         icon = Icons.Default.ExitToApp,
-                        title = "Одјави се",
+                        title = stringResource(id = R.string.logout),
                         iconTint = MaterialTheme.colorScheme.secondary,
                         onClick = {
                             authViewModel.signOut()
@@ -208,10 +241,10 @@ fun ProfileScreen(
                     )
                     ProfileMenuRow(
                         icon = Icons.Default.DeleteForever,
-                        title = "Избриши Акаунт",
+                        title = stringResource(id = R.string.delete_account),
                         titleColor = Color.Red,
                         iconTint = Color.Red,
-                        onClick = { /* TODO */ }
+                        onClick = { showDeleteAccountDialog = true }
                     )
                 }
             }
@@ -253,16 +286,92 @@ fun ProfileMenuRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageScreen(onBack: () -> Unit) {
+    // Ја читаме моментално активната локала за да го одразиме точниот избор при отворање
+    var selectedLanguage by remember {
+        val activeTag = AppCompatDelegate.getApplicationLocales().get(0)?.language
+        mutableStateOf(if (activeTag == "en") "en" else "mk")
+    }
+
+    fun applyLanguage(languageTag: String) {
+        selectedLanguage = languageTag
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Избери Јазик", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.secondary) } },
+                title = { Text(stringResource(id = R.string.choose_language), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, stringResource(id = R.string.back), tint = MaterialTheme.colorScheme.secondary) } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         containerColor = MaterialTheme.colorScheme.background
-    ) { p -> Box(Modifier.padding(p).fillMaxSize()) { Text("Опции за промена на јазик (MK / EN).", Modifier.padding(16.dp)) } }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.language),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column {
+                    LanguageOptionRow(
+                        label = stringResource(id = R.string.macedonian),
+                        selected = selectedLanguage == "mk",
+                        onClick = { applyLanguage("mk") }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    )
+                    LanguageOptionRow(
+                        label = stringResource(id = R.string.english),
+                        selected = selectedLanguage == "en",
+                        onClick = { applyLanguage("en") }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LanguageOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+    }
 }
 
 // =====================================================
@@ -280,10 +389,10 @@ fun NotificationsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Нотификации", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
+                title = { Text(stringResource(id = R.string.notifications), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.secondary)
+                        Icon(Icons.Default.ArrowBack, stringResource(id = R.string.back), tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -299,7 +408,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Подеси ги твоите известувања",
+                text = stringResource(id = R.string.notifications_subtitle),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 fontWeight = FontWeight.Medium
@@ -320,14 +429,14 @@ fun NotificationsScreen(onBack: () -> Unit) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Пуш Нотификации",
+                            text = stringResource(id = R.string.push_notifications),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Примај потсетници за претстојните настани на денот на настанот.",
+                            text = stringResource(id = R.string.push_notifications_description),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             lineHeight = 16.sp

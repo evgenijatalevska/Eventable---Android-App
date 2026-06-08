@@ -14,9 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.eventable.R
 import com.example.eventable.data.Offer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +45,8 @@ fun OfferDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Избриши понуда") },
-            text = { Text("Дали сте сигурни дека сакате да ја избришете оваа понуда?") },
+            title = { Text(stringResource(id = R.string.delete_offer)) },
+            text = { Text(stringResource(id = R.string.delete_offer_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -52,12 +54,12 @@ fun OfferDetailScreen(
                         onDelete()
                     }
                 ) {
-                    Text("Избриши", color = Color.Red)
+                    Text(stringResource(id = R.string.delete), color = Color.Red)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Откажи", color = MaterialTheme.colorScheme.secondary)
+                    Text(stringResource(id = R.string.cancel), color = MaterialTheme.colorScheme.secondary)
                 }
             }
         )
@@ -68,7 +70,7 @@ fun OfferDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEditMode) "Уреди понуда" else offer.title,
+                        text = if (isEditMode) stringResource(id = R.string.edit_offer) else offer.title,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -83,7 +85,7 @@ fun OfferDetailScreen(
                     }) {
                         Icon(
                             imageVector = if (isEditMode) Icons.Default.Close else Icons.Default.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -91,10 +93,10 @@ fun OfferDetailScreen(
                 actions = {
                     if (!isEditMode) {
                         IconButton(onClick = { isEditMode = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Уреди", tint = MaterialTheme.colorScheme.secondary)
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(id = R.string.edit), tint = MaterialTheme.colorScheme.secondary)
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Избриши", tint = Color.Red)
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.delete), tint = Color.Red)
                         }
                     }
                 },
@@ -116,7 +118,7 @@ fun OfferDetailScreen(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Име на понуда") },
+                    label = { Text(stringResource(id = R.string.offer_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = dynamicTextFieldColors()
@@ -125,7 +127,7 @@ fun OfferDetailScreen(
                 OutlinedTextField(
                     value = content,
                     onValueChange = { content = it },
-                    label = { Text("Детали за понудата...") },
+                    label = { Text(stringResource(id = R.string.offer_content_label)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 300.dp),
@@ -146,7 +148,7 @@ fun OfferDetailScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
                     ) {
-                        Text("Откажи")
+                        Text(stringResource(id = R.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -160,7 +162,7 @@ fun OfferDetailScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         enabled = title.isNotEmpty()
                     ) {
-                        Text("Зачувај", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.save), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -170,13 +172,13 @@ fun OfferDetailScreen(
                     Text("📝", fontSize = 20.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     // Поправено: Сега тука долу динамички се испишува вистинскиот наслов на понудата
-                    Text(text = "Детали: ", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = stringResource(id = R.string.offer_details_label), fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (offer.content.isNotEmpty()) offer.content else "Нема внесено дополнителни податоци.",
+                    text = if (offer.content.isNotEmpty()) offer.content else stringResource(id = R.string.no_offer_details),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     lineHeight = 24.sp,

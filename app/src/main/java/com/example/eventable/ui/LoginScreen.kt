@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +59,8 @@ fun LoginScreen(
     val errorMessage by viewModel.errorMessage
     val isLoading by viewModel.isLoading
 
+    val facebookLoginError = stringResource(id = R.string.facebook_login_error)
+
     // Иницијализација на Firebase Analytics
     val analytics = remember { FirebaseAnalytics.getInstance(context) }
 
@@ -82,7 +85,7 @@ fun LoginScreen(
                     viewModel.signInWithGoogle(idToken) { onLoginSuccess() }
                 }
             } catch (e: ApiException) {
-                viewModel.setErrorMessage("Google грешка: ${e.localizedMessage}")
+                viewModel.setErrorMessage(context.getString(R.string.google_error_prefixed, e.localizedMessage))
             }
         }
     }
@@ -99,7 +102,7 @@ fun LoginScreen(
             }
             override fun onCancel() {}
             override fun onError(error: FacebookException) {
-                viewModel.setErrorMessage(error.localizedMessage ?: "Грешка при најава со Facebook")
+                viewModel.setErrorMessage(error.localizedMessage ?: facebookLoginError)
             }
         })
         onDispose { loginManager.unregisterCallback(callbackManager) }
@@ -117,7 +120,7 @@ fun LoginScreen(
         // Лого
         Image(
             painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Eventable Logo",
+            contentDescription = stringResource(id = R.string.eventable_logo_description),
             modifier = Modifier
                 .height(120.dp)
                 .padding(bottom = 8.dp)
@@ -125,7 +128,7 @@ fun LoginScreen(
 
         // Наслов
         Text(
-            text = "Eventable",
+            text = stringResource(id = R.string.app_name),
             fontSize = 36.sp,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.secondary,
@@ -134,7 +137,7 @@ fun LoginScreen(
 
         // Мото
         Text(
-            text = "Управувањето со родендени никогаш не било полесно!",
+            text = stringResource(id = R.string.login_tagline),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
@@ -145,7 +148,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Е-маил адреса") },
+            label = { Text(stringResource(id = R.string.email_address)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = dynamicTextFieldColors()
@@ -157,7 +160,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Лозинка") },
+            label = { Text(stringResource(id = R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -194,7 +197,7 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Најави се",
+                    text = stringResource(id = R.string.login),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -208,7 +211,7 @@ fun LoginScreen(
                 onEmailLoginClick()
             }) {
                 Text(
-                    text = "Немаш профил? Регистрирај се тука",
+                    text = stringResource(id = R.string.no_account),
                     color = MaterialTheme.colorScheme.secondary,
                     fontSize = 14.sp
                 )
@@ -217,7 +220,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "или продолжи преку",
+                text = stringResource(id = R.string.or_continue_via),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
@@ -242,12 +245,12 @@ fun LoginScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.google),
-                    contentDescription = "Google",
+                    contentDescription = stringResource(id = R.string.google_label),
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = "Google",
+                    text = stringResource(id = R.string.google_label),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -273,12 +276,12 @@ fun LoginScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.facebook),
-                    contentDescription = "Facebook",
+                    contentDescription = stringResource(id = R.string.facebook_label),
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = "Facebook",
+                    text = stringResource(id = R.string.facebook_label),
                     color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -304,7 +307,7 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Гостин",
+                    text = stringResource(id = R.string.guest_label),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium

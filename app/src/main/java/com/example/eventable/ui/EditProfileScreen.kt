@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.eventable.R
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +34,7 @@ fun EditProfileScreen(
     onBack: () -> Unit
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
-    val userEmail = currentUser?.email ?: "Нема е-маил"
+    val userEmail = currentUser?.email ?: stringResource(id = R.string.no_email)
 
     // Ги земаме точните состојби од твојот AuthViewModel
     var firstName by remember { mutableStateOf(authViewModel.firstNameState.value) }
@@ -55,10 +57,10 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Уреди Профил", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
+                title = { Text(stringResource(id = R.string.edit_profile), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад", tint = MaterialTheme.colorScheme.secondary)
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back), tint = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -102,14 +104,14 @@ fun EditProfileScreen(
                     if (selectedImageUri != null) {
                         AsyncImage(
                             model = selectedImageUri,
-                            contentDescription = "Профилна слика",
+                            contentDescription = stringResource(id = R.string.profile_picture),
                             modifier = Modifier.fillMaxSize().clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Профилна слика",
+                            contentDescription = stringResource(id = R.string.profile_picture),
                             modifier = Modifier.size(50.dp),
                             tint = MaterialTheme.colorScheme.secondary
                         )
@@ -127,7 +129,7 @@ fun EditProfileScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Промени слика",
+                        contentDescription = stringResource(id = R.string.change_picture),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -142,7 +144,7 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = userEmail,
                 onValueChange = {},
-                label = { Text("Е-маил адреса (Заклучено)") },
+                label = { Text(stringResource(id = R.string.email_address_locked)) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -161,7 +163,7 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { text -> firstName = text },
-                label = { Text("Име") },
+                label = { Text(stringResource(id = R.string.first_name)) },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -171,7 +173,7 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = lastName,
                 onValueChange = { text -> lastName = text },
-                label = { Text("Презиме") },
+                label = { Text(stringResource(id = R.string.last_name)) },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -181,7 +183,7 @@ fun EditProfileScreen(
             OutlinedTextField(
                 value = companyName,
                 onValueChange = { text -> companyName = text },
-                label = { Text("Име на игротека") },
+                label = { Text(stringResource(id = R.string.company_name_label)) },
                 leadingIcon = { Icon(Icons.Default.Business, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -211,7 +213,7 @@ fun EditProfileScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Зачувај Промени", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
+                Text(stringResource(id = R.string.save_changes), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,8 +55,18 @@ fun CalendarScreen(
     var selectedDay by remember { mutableStateOf(today.get(Calendar.DAY_OF_MONTH)) }
 
     val monthNames = listOf(
-        "Јануари", "Февруари", "Март", "Април", "Мај", "Јуни",
-        "Јули", "Август", "Септември", "Октомври", "Ноември", "Декември"
+        stringResource(id = R.string.month_january),
+        stringResource(id = R.string.month_february),
+        stringResource(id = R.string.month_march),
+        stringResource(id = R.string.month_april),
+        stringResource(id = R.string.month_may),
+        stringResource(id = R.string.month_june),
+        stringResource(id = R.string.month_july),
+        stringResource(id = R.string.month_august),
+        stringResource(id = R.string.month_september),
+        stringResource(id = R.string.month_october),
+        stringResource(id = R.string.month_november),
+        stringResource(id = R.string.month_december)
     )
 
     val selectedDateStr = "%02d.%02d.%04d".format(selectedDay, currentMonth + 1, currentYear)
@@ -114,7 +125,7 @@ fun CalendarScreen(
                             )
                     )
                     Text(
-                        text = "Календар",
+                        text = stringResource(id = R.string.calendar),
                         fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White,
@@ -188,7 +199,15 @@ fun CalendarScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                listOf("Пон", "Вто", "Сре", "Чет", "Пет", "Саб", "Нед").forEach { day ->
+                                listOf(
+                                    stringResource(id = R.string.weekday_mon),
+                                    stringResource(id = R.string.weekday_tue),
+                                    stringResource(id = R.string.weekday_wed),
+                                    stringResource(id = R.string.weekday_thu),
+                                    stringResource(id = R.string.weekday_fri),
+                                    stringResource(id = R.string.weekday_sat),
+                                    stringResource(id = R.string.weekday_sun)
+                                ).forEach { day ->
                                     Text(
                                         text = day,
                                         fontSize = 11.sp,
@@ -278,9 +297,9 @@ fun CalendarScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = if (eventsForSelectedDay.isEmpty())
-                            "Нема настани за $selectedDateStr"
+                            stringResource(id = R.string.no_events_for_date, selectedDateStr)
                         else
-                            "Настани за $selectedDateStr",
+                            stringResource(id = R.string.events_for_date, selectedDateStr),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (eventsForSelectedDay.isEmpty())
@@ -313,7 +332,7 @@ fun CalendarScreen(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Додај настан")
+            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add_event))
         }
     }
 }
@@ -367,7 +386,7 @@ fun CalendarEventCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Веќе додаден во Google Calendar",
+                        text = stringResource(id = R.string.already_added_google_calendar),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Medium
@@ -382,7 +401,7 @@ fun CalendarEventCard(
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Text(
-                        text = "Додај во Google Calendar",
+                        text = stringResource(id = R.string.add_to_google_calendar),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Medium
@@ -406,9 +425,9 @@ fun addEventToGoogleCalendar(context: Context, event: Event) {
             putExtra(
                 CalendarContract.Events.DESCRIPTION,
                 buildString {
-                    if (event.offer.isNotEmpty()) append("Понуда: ${event.offer}\n")
-                    if (event.food.isNotEmpty()) append("Храна: ${event.food}\n")
-                    if (event.notes.isNotEmpty()) append("Белешки: ${event.notes}")
+                    if (event.offer.isNotEmpty()) append(context.getString(R.string.offer_prefixed, event.offer) + "\n")
+                    if (event.food.isNotEmpty()) append(context.getString(R.string.food_prefixed, event.food) + "\n")
+                    if (event.notes.isNotEmpty()) append(context.getString(R.string.notes_prefixed, event.notes))
                 }
             )
             putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext // ДОДАДЕНО ЗА ANALYTICS
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -78,7 +79,7 @@ fun OffersScreen(
 
                         // Наслов „Понуди“ спуштен на исто ниво како кај Настани
                         Text(
-                            text = "Понуди",
+                            text = stringResource(id = R.string.offers),
                             fontSize = 26.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
@@ -145,13 +146,13 @@ fun OffersScreen(
                         Text(text = "📑", fontSize = 48.sp)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Нема зачувани понуди",
+                            text = stringResource(id = R.string.no_saved_offers),
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Притисни + за да креираш нова понуда",
+                            text = stringResource(id = R.string.press_plus_create_offer),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                         )
@@ -175,7 +176,7 @@ fun OffersScreen(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Додај понуда")
+            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add_offer))
         }
     }
 }

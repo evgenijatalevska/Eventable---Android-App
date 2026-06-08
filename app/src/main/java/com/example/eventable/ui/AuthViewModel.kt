@@ -323,4 +323,23 @@ class AuthViewModel : ViewModel() {
         auth.signOut()
         _isUserLoggedIn.value = false
     }
+
+    // Бришење на акаунт
+    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val user = auth.currentUser ?: return
+        val uid = user.uid
+        viewModelScope.launch {
+            isLoading.value = true
+            try {
+                firestore.collection("users").document(uid).delete().await()
+                user.delete().await()
+                _isUserLoggedIn.value = false
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.localizedMessage ?: "Грешка при бришење на акаунтот")
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
 }
