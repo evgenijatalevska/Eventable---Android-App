@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext // ДОДАДЕНО ЗА ANALYTICS
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +57,7 @@ fun OffersScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp) // Малку понизок бидејќи нема копче за календар
+                            .height(dimensionResource(id = R.dimen.header_height_offers)) // Малку понизок бидејќи нема копче за календар
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.events_header), // Можеш да ставиш и R.drawable.offers_header ако имаш посебна слика
@@ -189,7 +190,7 @@ fun OfferCardWhite(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = dimensionResource(id = R.dimen.screen_horizontal_padding), vertical = 8.dp)
             .shadow(6.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)

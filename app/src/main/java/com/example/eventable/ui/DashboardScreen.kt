@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +71,12 @@ fun DashboardScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // На пошироки екрани (таблети, екстендирана ширина) ја прикажуваме навигацијата
+    // како странична NavigationRail наместо долна NavigationBar.
+    val windowSizeClass = LocalWindowSizeClass.current
+    val useNavigationRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.COMPACT
+
     var currentAppScreen by remember { mutableStateOf(AppScreen.HOME) }
 
     // Состојба за под-екраните на профилот
@@ -232,6 +239,7 @@ fun DashboardScreen(
                 }
             },
             bottomBar = {
+                if (!useNavigationRail) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.background,
                     tonalElevation = 8.dp
@@ -310,14 +318,101 @@ fun DashboardScreen(
                         )
                     )
                 }
+                }
             },
             containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                if (useNavigationRail) {
+                    NavigationRail(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        NavigationRailItem(
+                            icon = {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.nav_menu),
+                                    tint = if (drawerState.isOpen) MaterialTheme.colorScheme.secondary
+                                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                )
+                            },
+                            label = { Text(stringResource(id = R.string.nav_menu), fontSize = 11.sp) },
+                            selected = drawerState.isOpen,
+                            onClick = {
+                                scope.launch {
+                                    if (drawerState.isOpen) drawerState.close() else drawerState.open()
+                                }
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                            )
+                        )
+                        NavigationRailItem(
+                            icon = {
+                                Icon(
+                                    Icons.Default.Home,
+                                    contentDescription = stringResource(id = R.string.home),
+                                    tint = if (currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null)
+                                        MaterialTheme.colorScheme.secondary
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                )
+                            },
+                            label = { Text(stringResource(id = R.string.home), fontSize = 11.sp) },
+                            selected = currentAppScreen == AppScreen.HOME && !showAddEvent && selectedEventId == null && !showAddOffer && selectedOfferId == null,
+                            onClick = {
+                                currentAppScreen = AppScreen.HOME
+                                currentProfileSubScreen = ProfileSubScreen.MAIN
+                                selectedEventId = null
+                                showAddEvent = false
+                                selectedOfferId = null
+                                showAddOffer = false
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                            )
+                        )
+                        NavigationRailItem(
+                            icon = {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = stringResource(id = R.string.profile),
+                                    tint = if (currentAppScreen == AppScreen.PROFILE) MaterialTheme.colorScheme.secondary
+                                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                )
+                            },
+                            label = { Text(stringResource(id = R.string.profile), fontSize = 11.sp) },
+                            selected = currentAppScreen == AppScreen.PROFILE,
+                            onClick = {
+                                currentAppScreen = AppScreen.PROFILE
+                                currentProfileSubScreen = ProfileSubScreen.MAIN
+                                selectedEventId = null
+                                showAddEvent = false
+                                selectedOfferId = null
+                                showAddOffer = false
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                            )
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                ) {
                 when {
                     // --- НАВИГАЦИЈА ЗА НАСТАНИ ---
                     showAddEvent -> {
@@ -409,6 +504,7 @@ fun DashboardScreen(
                         }
                     }
                 }
+                }
             }
         }
     }
@@ -459,7 +555,7 @@ fun HomeContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = dimensionResource(id = R.dimen.home_horizontal_padding))
     ) {
         Spacer(modifier = Modifier.height(20.dp))
 

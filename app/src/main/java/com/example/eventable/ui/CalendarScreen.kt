@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -104,7 +105,7 @@ fun CalendarScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp)
+                        .height(dimensionResource(id = R.dimen.header_height_calendar))
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.events_header),
@@ -316,7 +317,7 @@ fun CalendarScreen(
                     onEventClick = { onEventClick(event.id) },
                     onAddToGoogleCalendar = { addEventToGoogleCalendar(context, event) },
                     onMarkAdded = { eventViewModel.markAddedToCalendar(event.id) },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.screen_horizontal_padding), vertical = 4.dp)
                 )
             }
 

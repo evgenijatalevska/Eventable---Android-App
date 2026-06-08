@@ -14,7 +14,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.eventable.ui.AuthViewModel
 import com.example.eventable.ui.DashboardScreen
 import com.example.eventable.ui.LoginScreen
+import com.example.eventable.ui.LocalWindowSizeClass
 import com.example.eventable.ui.RegisterScreen
+import com.example.eventable.ui.rememberWindowSizeClass
 import com.example.eventable.ui.theme.EventableTheme
 import com.facebook.CallbackManager
 
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
             val isDark = lux < LightSensorManager.DARK_MODE_THRESHOLD
 
             EventableTheme(darkTheme = isDark) {
+              CompositionLocalProvider(LocalWindowSizeClass provides rememberWindowSizeClass()) {
                 val isLoggedIn by authViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
                 var currentScreen by remember {
@@ -93,6 +96,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                 }
+              }
             }
         }
     }

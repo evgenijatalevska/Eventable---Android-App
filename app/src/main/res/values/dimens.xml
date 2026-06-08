@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Header image heights for the Events / Calendar / Offers screens -->
+    <dimen name="header_height_events">240dp</dimen>
+    <dimen name="header_height_calendar">220dp</dimen>
+    <dimen name="header_height_offers">200dp</dimen>
+
+    <!-- Horizontal content padding used across list screens and the Home content -->
+    <dimen name="screen_horizontal_padding">16dp</dimen>
+    <dimen name="home_horizontal_padding">20dp</dimen>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape has less vertical space, so header images are shorter -->
+    <dimen name="header_height_events">180dp</dimen>
+    <dimen name="header_height_calendar">160dp</dimen>
+    <dimen name="header_height_offers">150dp</dimen>
+
+    <dimen name="screen_horizontal_padding">16dp</dimen>
+    <dimen name="home_horizontal_padding">20dp</dimen>
+</resources>
