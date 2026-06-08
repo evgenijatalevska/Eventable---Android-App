@@ -32,7 +32,7 @@ fun RegisterScreen(
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var companyName by remember { mutableStateOf("") }
-    var isLoginMode by remember { mutableStateOf(true) }
+    var isLoginMode by remember { mutableStateOf(false) }
     var registrationSuccess by remember { mutableStateOf(false) }
 
     val context = LocalContext.current

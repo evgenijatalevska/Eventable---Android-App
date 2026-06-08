@@ -196,12 +196,12 @@ fun DashboardScreen(
                         title = {
                             when {
                                 showAddEvent -> Text(
-                                    stringResource(id = R.string.new_event),
+                                    stringResource(id = R.string.events),
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.secondary
                                 )
                                 showAddOffer -> Text(
-                                    stringResource(id = R.string.new_offer),
+                                    stringResource(id = R.string.offers),
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.secondary
                                 )

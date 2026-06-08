@@ -266,7 +266,7 @@ fun LoginScreen(
                     analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
 
                     onFacebookLoginClick()
-                    facebookLauncher.launch(listOf("public_profile"))
+                    facebookLauncher.launch(listOf("public_profile", "email"))
                 },
                 modifier = Modifier
                     .fillMaxWidth()

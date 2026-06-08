@@ -63,6 +63,19 @@ fun ProfileScreen(
             .getBoolean("notifications_enabled", true)
     }
 
+    // Следење на активниот јазик за динамичен поднаслов на копчето „Јазик"
+    val macedonianLabel = stringResource(id = R.string.macedonian)
+    val englishLabel = stringResource(id = R.string.english)
+    fun currentLanguageLabel() =
+        if (AppCompatDelegate.getApplicationLocales().get(0)?.language == "en") englishLabel else macedonianLabel
+
+    var languageSubtitle by remember { mutableStateOf(currentLanguageLabel()) }
+
+    // Секогаш кога корисникот ќе се врати на овој екран, го освежуваме избраниот јазик
+    LaunchedEffect(Unit) {
+        languageSubtitle = currentLanguageLabel()
+    }
+
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
 
     val gradientBackground = Brush.verticalGradient(
@@ -200,7 +213,7 @@ fun ProfileScreen(
                     ProfileMenuRow(
                         icon = Icons.Default.Language,
                         title = stringResource(id = R.string.language),
-                        subtitle = stringResource(id = R.string.macedonian),
+                        subtitle = languageSubtitle,
                         onClick = onLanguageClick
                     )
                     HorizontalDivider(
